@@ -6,21 +6,22 @@ from flask import Flask
 import pymysql
 
 
-app = Flask(__name__)
+def create_app():
+    return Flask(__name__)
+
+app = create_app()
 
 
 
 def connect():
-    tmp = pymysql.connect(
+    return pymysql.connect(
         host = "tree-table-demo-database",
         user = "root",
         password = "tree-table-demo-mysql-root-password",
-        database ="tree_table_demo",
-        cursorcalss = pymysql.cursors.DictCursor
+        database = "tree_table_demo",
+        cursorclass = pymysql.cursors.DictCursor
     )
-    reveal_type(tmp)
-
-    return tmp
+    
 
 def make_json(data):
     return json.dumps(data).encode('utf-8')
@@ -32,4 +33,7 @@ def get_process_list():
         cursor.execute("select * from process_list")
         result = cursor.fetchall()
     return make_json(result), 200
+
+if __name__ == '__main__':
+    app.run()
 
