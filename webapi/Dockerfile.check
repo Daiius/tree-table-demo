@@ -1,0 +1,15 @@
+FROM python:3.12-rc-bullseye
+
+WORKDIR /check
+
+# development libraries
+RUN pip install mypy
+
+# runtime libraries
+RUN pip install flask flask-cors pymysql \
+  types-PyMySQL types-Flask types-Flask-Cors
+
+COPY webapi_server.py /check
+
+CMD mypy webapi_server.py
+
