@@ -3,11 +3,11 @@ FROM python:3.12-rc-bullseye
 WORKDIR /check
 
 # development libraries
-RUN pip install mypy
+RUN pip install mypy \
+  types-PyMySQL types-Flask types-Flask-Cors
 
 # runtime libraries
-RUN pip install flask flask-cors pymysql \
-  types-PyMySQL types-Flask types-Flask-Cors
+RUN pip install flask flask-cors pymysql
 
 COPY webapi_server.py /check
 
