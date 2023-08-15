@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  tree-table-demo-webapi-test-database:
+    build:
+      context: ../database
+      dockerfile: Dockerfile
+    container_name: tree-table-demo-webapi-test-database
+    ports:
+      - 3306:3306
+    cap_add:
+      - SYS_NICE
+    healthcheck:
+      #test: ["CMD", "mysql", "-u", "root", "-ptree-table-demo-database-mysql-root-password", "-e", '"select 1;"']
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 1s
+      retries: 10
+      start_period: 2s
+
+  tree-table-demo-webapi-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: tree-table-demo-webapi-test
+    depends_on:
+      tree-table-demo-webapi-test-database:
+        condition: service_healthy
+
+networks:
+  default:
+    name: tree-table-demo-webapi-test-network
+

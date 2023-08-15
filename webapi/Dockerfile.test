@@ -1,0 +1,9 @@
+FROM python:3.12-rc-bullseye
+
+WORKDIR /test
+
+RUN pip install flask flask-cors pymysql cryptography
+
+COPY webapi_server.py unittest_webapi_server.py /test
+
+CMD python3 unittest_webapi_server.py
