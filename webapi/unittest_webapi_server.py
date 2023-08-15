@@ -10,10 +10,18 @@ class WebApiServerTest(unittest.TestCase):
         # enable usual exception propagation,
         # not like HTTP error message by default Flask error handler.
         self.app.testing = True
-        print("self.app.testing = True")
+        #print("self.app.testing = True")
 
     def test_get_process_list(self):
         response = self.client.get("/processes")
+        data = response.get_json()
+
+    def test_get_root_processes(self):
+        response = self.client.get("/processes/roots")
+        data = response.get_json()
+
+    def test_get_descendant_processes(self):
+        response = self.client.get("/processes/descendants/dummy_id0;dummy_id1;dummy_id2")
         data = response.get_json()
 
 if __name__ == '__main__':
