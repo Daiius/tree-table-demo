@@ -20,8 +20,8 @@ class WebApiServerTest(unittest.TestCase):
         response = self.client.get("/processes/roots")
         data = response.get_json()
 
-    def test_get_descendant_processes(self):
-        response = self.client.get("/processes/descendants/dummy_id0;dummy_id1;dummy_id2")
+    def test_get_processes_trees(self):
+        response = self.client.get("/processes/trees/dummy_id0;dummy_id1;dummy_id2")
         data = response.get_json()
 
 if __name__ == '__main__':

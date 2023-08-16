@@ -5,6 +5,8 @@ from flask import Flask
 
 import pymysql
 
+from webapi_server_helper import build_json
+
 app = Flask(__name__)
 reveal_type(app)
 
@@ -43,40 +45,15 @@ def get_process_roots() -> tuple[bytes, int]:
         result = cursor.fetchall()
     return make_json(result), 200
 
-@app.route("/processes/descendants/<string:ids>", methods=["GET"])
-def get_process_descendants(ids: str) -> tuple[bytes, int]:
+@app.route("/processes/trees/<string:ids>", methods=["GET"])
+def get_process_tree(ids: str) -> tuple[bytes, int]:
     """
     ids: semicolon separated process ids
     """
     connection = connect(app.testing)
     ids_list = ids.split(";")
-    with connection.cursor() as cursor:
-        parameters_sql = ", ".join(["%s"] * len(ids_list))
-        cursor.execute(f"""
-            with recursive r as (
-                select
-                    process_id, process_type, prev_id
-                from
-                    process_list
-                where
-                    process_id in ({parameters_sql})
-                union select
-                    p.process_id, p.process_type, p.prev_id
-                from
-                    process_list as p, r
-                where
-                    p.prev_id = r.process_id
-            )
-            select
-                process_id, process_type, prev_id
-            from
-               r 
-        """,
-        ids_list
-        )
-        result = cursor.fetchall()
+    result = build_json(connection, ids_list)
     return make_json(result), 200
-
 
 if __name__ == '__main__':
     app.run()
