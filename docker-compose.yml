@@ -11,12 +11,19 @@ services:
   database:
     build:
       context: ./database
-      args:
-        MYSQL_ROOT_PASSWORD: tree-table-demo-database-mysql-root-password
-        MYSQL_DATABASE: tree_table_demo
+      dockerfile: Dockerfile.test
     container_name: tree-table-demo-database
     ports:
       - 3306:3306
+
+  webapi:
+    build:
+      context: ./webapi
+      dockerfile: Dockerfile.develop
+    container_name: tree-table-demo-webapi
+    ports:
+      - 8000:8000
+
 
 networks:
   default:
