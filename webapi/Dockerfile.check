@@ -7,7 +7,7 @@ RUN pip install mypy \
   types-PyMySQL types-Flask types-Flask-Cors
 
 # runtime libraries
-RUN pip install flask flask-cors pymysql
+RUN pip install flask flask-cors pymysql dataclasses_json
 
 COPY webapi_server.py webapi_server_helper.py /check
 
