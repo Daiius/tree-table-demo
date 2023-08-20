@@ -5,7 +5,7 @@ from flask import Flask
 
 import pymysql
 
-from webapi_server_helper import build_json
+from webapi_server_helper import build_json, ProcessTreeNode
 
 app = Flask(__name__)
 reveal_type(app)
@@ -56,5 +56,5 @@ def get_process_tree(ids: str) -> tuple[bytes, int]:
     return make_json(result), 200
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True, host="0.0.0.0", port=8000)
 

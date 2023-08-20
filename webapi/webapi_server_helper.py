@@ -4,19 +4,52 @@ import itertools
 import dataclasses
 import typing
 
+import dataclasses_json
+
 @dataclasses.dataclass
 class Evaluation:
     evaluation_type: str
     evaluation_contents: dict[str, str]
 
+@dataclasses_json.dataclass_json
 @dataclasses.dataclass
 class ProcessTreeNode:
     process_id: str
     process_type: str
-    parent: typing.Optional["ProcessTreeNode"]
-    children: list["ProcessTreeNode"]
+    #parent: typing.Optional["ProcessTreeNode"]
     conditions: dict[str, str]
     evaluations: dict[str, dict[str, str]]
+    children: list["ProcessTreeNode"]
+
+def to_dict(obj: object, classkey=None):
+    """
+    convert object to dict
+    reference:
+    https://stackoverflow.com/questions/1036409/recursively-convert-python-object-graph-to-dictionary
+    """
+    #print("obj: ", obj)
+    if isinstance(obj, dict):
+        data = {}
+        for (k,v) in obj.items():
+            data[k] = to_dict(v, classkey)
+        return data
+    elif hasattr(obj, "_ast"):
+        return to_dict(obj._ast())
+    elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+        return [to_dict(v, classkey) for v in obj]
+    elif hasattr(obj, "__dict__"):
+        #print("obj, __dict__: ", obj, flush=True)
+        data = dict([
+            (key, to_dict(value, classkey))
+            for key, value in obj.__dict__.items()
+            if not callable(value) and not key.startswith('_')
+        ])
+        if classkey is not None and hasattr(obj, "__class__"):
+            data[classkey] = obj.__class__.__name__
+        return data
+    else:
+        return str(obj)
+
 
 def _get_descendant_process_list(
     connection: pymysql.connections.Connection,
@@ -118,7 +151,7 @@ def _process_entry_to_node(
     return ProcessTreeNode(
         process_id = process_list_entry["process_id"],
         process_type = process_list_entry["process_type"],
-        parent = parent,
+        #parent = parent,
         children = [],
         conditions = condition_entry,
         evaluations = evaluation_entry
@@ -131,11 +164,18 @@ def _build_process_tree(
     condition_dict: dict[str, dict[str, typing.Any]],
     evaluation_dict: dict[str, dict[str, dict[str, typing.Any]]]
 ) -> ProcessTreeNode:
+    
+    if list_entry["process_id"] in evaluation_dict:
+        evaluation_entry = evaluation_dict[list_entry["process_id"]]
+    else:
+        evaluation_entry = {}
+
+    evaluation_entry
     node = _process_entry_to_node(
         parent = parent,
         process_list_entry = list_entry,
         condition_entry = condition_dict[list_entry["process_id"]],
-        evaluation_entry = evaluation_dict[list_entry["process_id"]]
+        evaluation_entry = evaluation_entry
     )
     child_list_entries = [p for p in related_process_list if p["prev_id"] == node.process_id]
     for child_list_entry in child_list_entries:
@@ -181,8 +221,6 @@ def build_json(
 ) -> list[ProcessTreeNode]:
     # First, get related process_list data 
     related_process_list = _get_descendant_process_list(connection, ids_list)
-    print(related_process_list, flush=True)
-    typing.reveal_type(related_process_list)
     # Second, get conditions from related tables
     # to use groupby(), list should be sorted.
     related_process_list.sort(key=lambda p: p["process_type"])
@@ -201,7 +239,11 @@ def build_json(
             condition_dict[condition["process_id"]] = condition
     # Third, get evaluations from related tables
     # to use groupby(), list should be sorted.
-    related_evaluations = _get_evaluation_list(connection, ids_list)
+    related_evaluations = _get_evaluation_list(
+        connection,
+        [p["process_id"] for p in related_process_list]
+    )
+    print("related_evaluations", related_evaluations, flush=True)
     related_evaluations.sort(key=lambda e: e["evaluation_type"])
     # store evaluation data by dictionary using process_id as keys
     # e.g.: evaluation_dict[process_id][evaluation_type][evaluation_column] = value
@@ -226,6 +268,8 @@ def build_json(
         evaluation_dict = evaluation_dict
     )
         
+    result = to_dict(root_nodes)
+    print("result: ", result, flush=True)
     
-    return root_nodes
+    return result
 

@@ -21,7 +21,7 @@ class WebApiServerTest(unittest.TestCase):
         data = response.get_json()
 
     def test_get_processes_trees(self):
-        response = self.client.get("/processes/trees/dummy_id0;dummy_id1;dummy_id2")
+        response = self.client.get("/processes/trees/0")
         data = response.get_json()
 
 if __name__ == '__main__':
