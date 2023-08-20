@@ -1,0 +1,10 @@
+FROM python:3.12-rc-bullseye
+
+WORKDIR /develop
+
+RUN pip install flask flask-cors pymysql cryptography dataclasses_json
+
+COPY webapi_server.py webapi_server_helper.py /develop
+
+CMD python3 webapi_server.py
+
