@@ -2,13 +2,14 @@ from typing import reveal_type
 import json
 
 from flask import Flask
+from flask_cors import CORS
 
 import pymysql
 
 from webapi_server_helper import build_json, ProcessTreeNode
 
 app = Flask(__name__)
-reveal_type(app)
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost"}})
 
 def connect(is_testing: bool) -> pymysql.connections.Connection:
     #print("app.testing: ", is_testing)

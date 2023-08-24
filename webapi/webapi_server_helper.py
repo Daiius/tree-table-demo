@@ -4,14 +4,7 @@ import itertools
 import dataclasses
 import typing
 
-import dataclasses_json
 
-@dataclasses.dataclass
-class Evaluation:
-    evaluation_type: str
-    evaluation_contents: dict[str, str]
-
-@dataclasses_json.dataclass_json
 @dataclasses.dataclass
 class ProcessTreeNode:
     process_id: str
