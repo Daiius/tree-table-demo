@@ -13,7 +13,7 @@ jobs:
     if:
       github.event.pull_request.user.login == github.repository_owner
       && ! github.event.pull_requests.draft
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
