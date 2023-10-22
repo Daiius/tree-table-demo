@@ -8,7 +8,9 @@
     "jsx": "react",
     "allowJs": true,
     "moduleResolution": "node",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "strict": true,
+    //"inlineSourceMap": true
   }
 }
 

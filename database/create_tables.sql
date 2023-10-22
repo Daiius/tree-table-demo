@@ -57,9 +57,12 @@ values
 ;
 
 create table material (
+  process_id varchar(36) not null,
   variety varchar(20) not null,
   origin varchar(20) not null,
   imported_date date not null,
+  foreign key (process_id) references process_list (process_id)
+  on update cascade on delete cascade,
   foreign key (variety) references variety_master (variety)
   on update cascade on delete restrict,
   foreign key (origin) references origin_master (origin)
@@ -123,9 +126,9 @@ create table evaluation_master (
 insert
   evaluation_master
 values
-  ("sugar content", "sugar_content"),
-  ("water content", "water_content"),
-  ("umami content", "umami_content")
+  ("sugar_content", "sugar_content"),
+  ("water_content", "water_content"),
+  ("umami_content", "umami_content")
 ;
 
 create table evaluation_list (

@@ -1,4 +1,4 @@
-FROM python:3.12-rc-bullseye
+FROM python:3.11-bullseye
 
 WORKDIR /check
 
@@ -7,9 +7,9 @@ RUN pip install mypy \
   types-PyMySQL types-Flask types-Flask-Cors
 
 # runtime libraries
-RUN pip install flask flask-cors pymysql
+RUN pip install flask flask-cors pymysql dataclasses_json
 
-COPY webapi_server.py /check
+COPY webapi_server.py webapi_server_helper.py /check
 
 CMD mypy webapi_server.py
 

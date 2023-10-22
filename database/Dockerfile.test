@@ -6,6 +6,8 @@ ENV MYSQL_DATABASE=tree_table_demo
 COPY minimal_memory.conf /etc/mysql/conf.d/
 COPY create_tables.sql /docker-entrypoint-initdb.d/
 
+COPY insert_test_data.sql /docker-entrypoint-initdb.d
+
 RUN ["sed", "-i", "s/exec \"$@\"/echo \"not running $@\"/", "/usr/local/bin/docker-entrypoint.sh"]
 
 RUN docker-entrypoint.sh mysqld
@@ -13,5 +15,5 @@ RUN docker-entrypoint.sh mysqld
 FROM mysql:8.0.32-debian
 
 COPY --from=builder /var/lib/mysql /var/lib/mysql
-COPY --from=builder /etc/mysql/conf.d /etc/mysql/conf.d
+COPY minimal_memory.conf /etc/mysql/conf.d
 

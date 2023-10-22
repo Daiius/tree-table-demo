@@ -4,7 +4,7 @@ services:
   tree-table-demo-webapi-test-database:
     build:
       context: ../database
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.test
     container_name: tree-table-demo-webapi-test-database
     ports:
       - 3306:3306
