@@ -15,4 +15,5 @@ RUN docker-entrypoint.sh mysqld
 FROM mysql:8.0.32-debian
 
 COPY --from=builder /var/lib/mysql /var/lib/mysql
+COPY minimal_memory.conf /etc/mysql/conf.d
 

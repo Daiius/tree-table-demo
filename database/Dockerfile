@@ -13,4 +13,5 @@ RUN docker-entrypoint.sh mysqld
 FROM mysql:8.0.32-debian
 
 COPY --from=builder /var/lib/mysql /var/lib/mysql
+COPY --from=builder /etc/mysql/conf.d /etc/mysql/conf.d
 
