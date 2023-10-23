@@ -16,7 +16,7 @@ interface ProcessTreeNode {
 const MainView = () => {
 
   const [data, isLoading, error] = useFetch(
-    "http://localhost:8000/processes/trees/0"
+    "http://localhost/api/processes/trees/0"
   );
 
   console.log(data);

@@ -3,7 +3,7 @@ version: "3.9"
 services:
   web-server:
     build:
-      context: ./interface
+      context: ./webserver
     container_name: tree-table-demo-web-server
     ports:
       - 80:80
