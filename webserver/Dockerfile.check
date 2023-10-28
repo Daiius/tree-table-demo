@@ -1,0 +1,14 @@
+
+FROM node:18
+
+WORKDIR /build
+
+COPY package.json package-lock.json /build
+
+RUN npm install
+
+COPY src/ /build/src/
+COPY tsconfig.json webpack.config.js tsconfig.eslint.json .eslintrc.js /build
+
+CMD bash -c "npx tsc --noEmit && npx eslint"
+

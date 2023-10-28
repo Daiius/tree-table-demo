@@ -10,7 +10,9 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "strict": true,
-    //"inlineSourceMap": true
+    //"inlineSourceMap": true,
+    // ignore node_module tsc --noEmit check
+    "skipLibCheck": true
   }
 }
 
