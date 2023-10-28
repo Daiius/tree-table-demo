@@ -21,6 +21,7 @@ services:
       context: ./webapi
       dockerfile: Dockerfile.develop
     container_name: tree-table-demo-webapi
+    stop_signal: SIGKILL
     ports:
       - 8000:8000
 
