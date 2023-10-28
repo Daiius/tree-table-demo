@@ -4,7 +4,7 @@ WORKDIR /develop
 
 RUN pip install flask flask-cors pymysql cryptography dataclasses_json uwsgi
 
-COPY webapi_server.py webapi_server_helper.py uwsgi.ini manage.py /develop
+COPY webapi_server.py webapi_server_helper.py uwsgi.ini /develop
 
 CMD uwsgi uwsgi.ini
 #CMD python3 webapi_server.py

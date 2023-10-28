@@ -1,55 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { Stack } from 'react-bootstrap';
+import SimpleTreeView from './SimpleTreeView';
 
 import { useFetch } from './useFetch';
 
-
-interface ProcessTreeNode {
-  process_id: string;
-  process_type: string;
-  conditions: {[key: string]: string};
-  evaluations: {[evalType: string]: {[evalColumn: string]: string}};
-  children: ProcessTreeNode[];
-}
+import { ProcessTreeNode } from './commonTypes';
 
 const MainView = () => {
 
-  const [data, isLoading, error] = useFetch(
+  const { data } = useFetch<ProcessTreeNode[]>(
     "http://localhost/api/processes/trees/0"
   );
 
   console.log(data);
 
-  const nodeView = (node: ProcessTreeNode, depth: number) => {
-
-    return (
-      <>
-        <div>
-          {node.process_type}
-          <div style={{marginLeft: "1rem"}}>
-            {Object.entries(node.conditions).map(([key, value], ientry) => 
-              <div key={ientry}>
-                {key}: {value}
-              </div>
-            )}
-          </div>
-        </div>
-        <div style={{marginLeft: "3rem"}}>
-          {node.children.map(child =>
-            nodeView(child, depth + 1)
-          )}
-        </div>
-      </>
-    );
-  };
-
+  if (data == null) return <div>loading...</div>;
 
   return (
-    <>
-      {data != null && data.map((d: ProcessTreeNode) => nodeView(d, 0))}
-    </>
+    <SimpleTreeView node={data[0]} depth={0}/>
   );
 };
 
 export default MainView;
+
