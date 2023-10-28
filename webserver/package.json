@@ -12,6 +12,7 @@
     "@types/react": "^18.2.18",
     "@types/react-dom": "^18.2.7",
     "css-loader": "^6.8.1",
+    "postcss-loader": "^7.3.3",
     "sass": "^1.64.2",
     "sass-loader": "^13.3.2",
     "style-loader": "^3.3.3",
