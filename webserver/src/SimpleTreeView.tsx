@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Stack from 'react-bootstrap/Stack';
+
 import { ProcessTreeNode } from './commonTypes';
 
 import './SimpleTreeView.scss';
@@ -29,7 +31,10 @@ const SimpleTreeView: React.FC<SimpleTreeViewProps> = ({
       </div>
       <div style={{marginLeft: "3rem"}}>
         {node.children.map(child =>
-          <SimpleTreeView node={child} />
+          <Stack direction="horizontal">
+            <i className="bi bi-arrow-return-right"/>
+            <SimpleTreeView node={child} />
+          </Stack>
         )}
       </div>
     </>

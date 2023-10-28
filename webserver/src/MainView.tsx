@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-
-import { Stack } from 'react-bootstrap';
+import React from 'react';
 
 import SimpleTreeView from './SimpleTreeView';
 
 import { useFetch } from './useFetch';
 
+import { ProcessTreeNode } from './commonTypes';
 
 const MainView = () => {
 
-  const [data, _isLoading, _error] = useFetch(
+  const { data } = useFetch<ProcessTreeNode[]>(
     "http://localhost/api/processes/trees/0"
   );
 

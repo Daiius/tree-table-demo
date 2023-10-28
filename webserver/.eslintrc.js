@@ -13,7 +13,7 @@ module.exports = {
     project: ['./tsconfig.eslint.json' ]
   },
   extends: [
-    'eslinnt:recommended',
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],

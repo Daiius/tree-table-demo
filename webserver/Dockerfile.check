@@ -10,5 +10,5 @@ RUN npm install
 COPY src/ /build/src/
 COPY tsconfig.json webpack.config.js tsconfig.eslint.json .eslintrc.js /build
 
-CMD bash -c "npx tsc --noEmit && npx eslint"
+CMD bash -c "npx tsc --noEmit && npx eslint ./src/**/*.ts ./src/**/*.tsx"
 
