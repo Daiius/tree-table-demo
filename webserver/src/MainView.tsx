@@ -17,7 +17,7 @@ const MainView = () => {
   if (data == null) return <div>loading...</div>;
 
   return (
-    <SimpleTreeView node={data[0]} />
+    <SimpleTreeView node={data[0]} depth={0}/>
   );
 };
 
