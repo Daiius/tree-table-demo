@@ -137,27 +137,31 @@ create table evaluation_list (
   foreign key (process_id) references process_list (process_id)
   on update cascade on delete cascade,
   foreign key (evaluation_type) references evaluation_master (evaluation_type)
-  on update cascade on delete restrict
+  on update cascade on delete restrict,
+  primary key (process_id, evaluation_type)
 );
 
 create table sugar_content (
   process_id varchar(36) not null,
+  evaluation_type varchar(20) not null default "sugar_content",
   sugar_content double not null,
-  foreign key (process_id) references evaluation_list (process_id)
+  foreign key (process_id, evaluation_type) references evaluation_list (process_id, evaluation_type)
   on update cascade on delete cascade
 );
 
 create table water_content (
   process_id varchar(36) not null,
+  evaluation_type varchar(20) not null default "water_content",
   water_content double not null,
-  foreign key (process_id) references evaluation_list (process_id)
+  foreign key (process_id, evaluation_type) references evaluation_list (process_id, evaluation_type)
   on update cascade on delete cascade
 );
 
 create table umami_content (
   process_id varchar(36) not null,
+  evaluation_type varchar(20) not null default "umami_content",
   umami_content double not null,
-  foreign key (process_id) references evaluation_list (process_id)
+  foreign key (process_id, evaluation_type) references evaluation_list (process_id, evaluation_type)
   on update cascade on delete cascade
 );
 

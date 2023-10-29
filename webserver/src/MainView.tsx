@@ -1,10 +1,14 @@
 import React from 'react';
 
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
+
 import SimpleTreeView from './SimpleTreeView';
+import TreeTableView from './TreeTableView';
 
 import { useFetch } from './useFetch';
 
-import { ProcessTreeNode } from './commonTypes';
+import { ProcessTreeNode, convertProcesTreeNodeData } from './commonTypes';
 
 const MainView = () => {
 
@@ -17,7 +21,21 @@ const MainView = () => {
   if (data == null) return <div>loading...</div>;
 
   return (
-    <SimpleTreeView node={data[0]} depth={0}/>
+    <Tabs
+      defaultActiveKey="tree-table-view"
+    >
+      <Tab eventKey="simple-tree-view" title="SimpleTreeView">
+        <SimpleTreeView
+          node={convertProcesTreeNodeData(data[0])}
+          depth={0}
+        />
+      </Tab>
+      <Tab eventKey="tree-table-view" title="TreeTableView">
+        <TreeTableView
+          node={convertProcesTreeNodeData(data[0])}
+        />
+      </Tab>
+    </Tabs>
   );
 };
 

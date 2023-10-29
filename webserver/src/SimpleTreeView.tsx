@@ -18,7 +18,7 @@ const SimpleTreeView: React.FC<SimpleTreeViewProps> = ({
   if (node == null) return <div>loading...</div>;
 
   return (
-    <>
+    <Stack gap={1}>
       <Stack
         className="simple-tree-view-return-arrow-stack"
         direction="horizontal"
@@ -39,15 +39,14 @@ const SimpleTreeView: React.FC<SimpleTreeViewProps> = ({
           </div>
         </div>
       </Stack>
-      <Stack
-        gap={1}
+      <div
         style={{marginLeft: "3rem"}}
       >
         {node.children.map(child =>
           <SimpleTreeView node={child} depth={depth+1}/>
         )}
-      </Stack>
-    </>
+      </div>
+    </Stack>
   );
 };
 
