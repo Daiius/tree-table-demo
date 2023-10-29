@@ -39,14 +39,13 @@ const SimpleTreeView: React.FC<SimpleTreeViewProps> = ({
           </div>
         </div>
       </Stack>
-      <Stack
-        gap={1}
+      <div
         style={{marginLeft: "3rem"}}
       >
         {node.children.map(child =>
           <SimpleTreeView node={child} depth={depth+1}/>
         )}
-      </Stack>
+      </div>
     </Stack>
   );
 };
