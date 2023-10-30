@@ -13,7 +13,8 @@ export type TableViewProps = {
 const TableView: React.FC<TableViewProps> = ({
   nodes
 }) => {
-  
+ 
+
   const conditionNames =
     Object.keys(nodes[0].conditions)
     .filter(name => name !== "process_id");
@@ -26,18 +27,25 @@ const TableView: React.FC<TableViewProps> = ({
       hover
       size="sm"
     >
-      <thead>
+      <thead
+        id={`group-${nodes[0].parent?.process_id}`}
+      >
         <tr>
-          {conditionNames.map((name, iname) =>
-            <th key={iname}>{name}</th>
+          {conditionNames.map(name =>
+            <th key={name}>{name}</th>
           )}
         </tr>
       </thead>
       <tbody>
-        {nodes.map((node, inode) =>
-          <tr key={inode}>
-            {conditionNames.map((name, iname) =>
-              <td key={iname}>{node.conditions[name]}</td>
+        {nodes.map(node =>
+          <tr
+            key={node.process_id}
+            id={`node-${node.process_id}`}
+          >
+            {conditionNames.map(name =>
+              <td key={name}>
+                {node.conditions[name]}
+              </td>
             )}
           </tr>
         )}
