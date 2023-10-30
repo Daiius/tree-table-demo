@@ -6,6 +6,7 @@ import TableView from './TableView';
 
 import { ProcessTreeNode } from './commonTypes';
 import { recursiveGroupNodes } from './nodeGroupUtils';
+import { useLeaderLine, Connection } from './useLeaderLine';
 
 import './TreeTableView.scss';
 
@@ -25,8 +26,25 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
     array: groupedNodes
   });
 
+  const connections: Connection[] = [];
+  const recursiveAddConnection = (node: ProcessTreeNode) => {
+    for (const child of node.children) {
+      connections.push({
+        from: `node-${node.process_id}`,
+        to: `group-${node.process_id}`
+      });
+      recursiveAddConnection(child);
+    }
+  };
+  recursiveAddConnection(node);
+
+  useLeaderLine({
+    connections
+  });
+
   return (
     <Table
+      id="tree-table-view-table"
       className="tree-table-view-table"
       responsive
     >
