@@ -31,8 +31,8 @@ const SimpleTreeView: React.FC<SimpleTreeViewProps> = ({
             {node.process_type}
           </div>
           <div style={{marginLeft: "1rem"}}>
-            {Object.entries(node.conditions).map(([key, value], ientry) => 
-              <div key={ientry}>
+            {Object.entries(node.conditions).map(([key, value]) => 
+              <div key={key}>
                 {key}: {value}
               </div>
             )}
@@ -43,7 +43,11 @@ const SimpleTreeView: React.FC<SimpleTreeViewProps> = ({
         style={{marginLeft: "3rem"}}
       >
         {node.children.map(child =>
-          <SimpleTreeView node={child} depth={depth+1}/>
+          <SimpleTreeView
+            key={child.process_id}
+            node={child}
+            depth={depth+1}
+          />
         )}
       </div>
     </Stack>

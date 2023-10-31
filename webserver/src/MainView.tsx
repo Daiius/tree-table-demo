@@ -23,6 +23,8 @@ const MainView = () => {
   return (
     <Tabs
       defaultActiveKey="tree-table-view"
+      mountOnEnter
+      unmountOnExit
     >
       <Tab eventKey="simple-tree-view" title="SimpleTreeView">
         <SimpleTreeView
