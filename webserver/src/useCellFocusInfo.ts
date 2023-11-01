@@ -3,17 +3,17 @@ import { useState } from 'react';
 export type CellFocusInfo = {
   commonParentId: string;
   commonProcessType: string;
-  irow: number;
-  icolumn: number;
+  rowId: string;
+  columnName: string;
 }
 
 export type SetCellFocusArgs = {
-  commonParentId: string|undefined;
-  commonProcessType: string|undefined;
-  nrow: number;
-  ncolumn: number;
-  irow: number;
-  icolumn: number;
+  commonParentId: string;
+  commonProcessType: string;
+  rowId: string;
+  columnName: string;
+  rowIds: string[];
+  columnNames: string[];
 }
 
 export type MoveCellFocusArgs = {
@@ -30,10 +30,10 @@ export type UseCellFocusInfoResult = {
 export const useCellFocusInfo = () => {
   const [commonParentId, setCommonParentId] = useState<string>();
   const [commonProcessType, setCommonProcessType] = useState<string>();
-  const [nrow, setNRow] = useState<number>(0);
-  const [ncolumn, setNColumn] = useState<number>(0);
-  const [irow, setIRow] = useState<number>(0);
-  const [icolumn, setIColumn] = useState<number>(0);
+  const [rowId, setRowId] = useState<string>();
+  const [columnName, setColumnName] = useState<string>();
+  const [rowIds, setRowIds] = useState<string[]>([]);
+  const [columnNames, setColumnNames] = useState<string[]>([]);
 
   const setCellFocus = ({
     commonParentId,
