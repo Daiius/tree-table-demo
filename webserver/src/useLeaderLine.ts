@@ -1,18 +1,34 @@
 import { useEffect } from 'react';
 import LeaderLine from 'leader-line-new';
 
+import { ProcessTreeNode } from './commonTypes';
+
 export type Connection = {
   from: string;
   to: string;
 }
 
 export type UseLeaderLineArgs = {
-  connections: Connection[];
+  rootNode: ProcessTreeNode;
 }
 
+
+
 export const useLeaderLine = ({
-  connections
+  rootNode
 }: UseLeaderLineArgs) => {
+  
+  const connections: Connection[] = [];
+  const recursiveAddConnection = (node: ProcessTreeNode) => {
+    for (const child of node.children) {
+      connections.push({
+        from: `node-${node.process_id}`,
+        to: `group-${node.process_id}`
+      });
+      recursiveAddConnection(child);
+    }
+  };
+  recursiveAddConnection(rootNode);
 
   useEffect(() => {
     const leaderLines: LeaderLine[] = [];
