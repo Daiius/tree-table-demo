@@ -6,7 +6,8 @@ import TableView from './TableView';
 
 import { ProcessTreeNode } from './commonTypes';
 import { recursiveGroupNodes } from './nodeGroupUtils';
-import { useLeaderLine, Connection } from './useLeaderLine';
+import { useLeaderLine } from './useLeaderLine';
+import { useTableCellFocus } from './useTableCellFocus';
 
 import './TreeTableView.scss';
 
@@ -26,21 +27,12 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
     array: groupedNodes
   });
 
-  const connections: Connection[] = [];
-  const recursiveAddConnection = (node: ProcessTreeNode) => {
-    for (const child of node.children) {
-      connections.push({
-        from: `node-${node.process_id}`,
-        to: `group-${node.process_id}`
-      });
-      recursiveAddConnection(child);
-    }
-  };
-  recursiveAddConnection(node);
+  useLeaderLine({rootNode: node});
 
-  useLeaderLine({
-    connections
-  });
+  const {
+    focusPosition,
+    setFocus
+  } = useTableCellFocus();
 
   return (
     <Table
@@ -59,7 +51,11 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
                 <div>
                   number of nodes: {nodes.length}
                 </div>
-                <TableView nodes={nodes} />
+                <TableView
+                  nodes={nodes}
+                  focusPosition={focusPosition}
+                  setFocus={setFocus}
+                />
               </td>
             )}
           </tr>
@@ -70,3 +66,4 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
 };
 
 export default TreeTableView;
+
