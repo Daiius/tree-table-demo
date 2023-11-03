@@ -10,11 +10,16 @@ export type CellPosition = {
   columnName: string;
 }
 
+export type FocusMode = "Focused" | "Editing";
+
 export type FocusPosition = TablePosition & CellPosition;
+
+export type FocusInfo = FocusPosition & FocusMode;
 
 export type SetFocusArgs = TablePosition & CellPosition & {
   rowNodeIds: string[];
   columnNames: string[];
+  focusMode: FocusMode;
 }
 
 export type MoveFocusArgs = {
@@ -24,6 +29,7 @@ export type MoveFocusArgs = {
 
 export type UseTableCellFocusHookResult = {
   focusPosition: FocusPosition|undefined;
+  focusMode: FocusMode;
   setFocus: (args: SetFocusArgs) => void;
   moveFocus: (args: MoveFocusArgs) => void;
 };
@@ -33,6 +39,7 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
   const [focusPosition, setFocusPosition] = useState<FocusPosition|undefined>();
   const [rowNodeIds, setRowNodeIds] = useState<string[]>([]);
   const [columnNames, setColumnNames] = useState<string[]>([]);
+  const [focusMode, setFocusMode] = useState<FocusMode>("Focused");
   
   // table cell, HTML <td> element, is usually not focusable.
   // focus is required to get key events.
@@ -46,8 +53,9 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
   //
   // going to use approach 2...
   useEffect(() => {
-    
-    const handleKeyDown = (e: KeyboardEvent) => {
+
+    // Cell focus mode, moving cells by keys
+    const handleKeyDownFocus = (e: KeyboardEvent) => {
       if (focusPosition == null) return;
 
       const key = e.code;
@@ -62,16 +70,58 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
           break;
         case !e.shiftKey && 'Tab':
           e.preventDefault();
+          // eslint-disable-next-line no-fallthrough
         case 'ArrowRight':
           moveFocus({ drow:  0, dcolumn:  1 });
           break;
         case e.shiftKey && 'Tab':
           e.preventDefault();
+          // eslint-disable-next-line no-fallthrough
         case 'ArrowLeft':
           moveFocus({ drow:  0, dcolumn: -1 });
           break;
         case 'Escape':
           defocus();
+          break;
+        case 'Shift':
+        case 'Alt':
+        case 'Control':
+          // do nothing
+          break;
+        default:
+          setFocus({
+            ...focusPosition,
+            rowNodeIds,
+            columnNames,
+            focusMode: "Editing"});
+          break;
+      }
+    };
+
+    const handleKeyDownEdit = (e: KeyboardEvent) => {
+      if (focusPosition== null) return;
+      const key = e.code;
+      switch (key) {
+        case 'Escape':
+          setFocus({
+            ...focusPosition,
+            rowNodeIds,
+            columnNames,
+            focusMode: "Focused"
+          });
+          break;
+      }
+    };
+
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (focusPosition == null) return;
+      switch (focusMode) {
+        case "Focused":
+          handleKeyDownFocus(e);
+          break;
+        case "Editing":
+          handleKeyDownEdit(e);
           break;
       }
     };
@@ -89,16 +139,18 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
     rowNodeId,
     columnName,
     rowNodeIds,
-    columnNames
+    columnNames,
+    focusMode
   }: SetFocusArgs) => {
     setFocusPosition({
       commonParentId,
       commonProcessType,
       rowNodeId,
-      columnName
+      columnName,
     });
     setRowNodeIds([...rowNodeIds]);
     setColumnNames([...columnNames]);
+    setFocusMode(focusMode);
   };
 
   const moveFocus = ({ drow, dcolumn}: MoveFocusArgs) => {
@@ -133,7 +185,10 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
     } else if (
       icolumn == 0 && dcolumn == -1 && irow === 0
     ) {
-      // do nothing
+      // currently do nothing
+      // TODO:
+      // want to go back to parent process
+      // need to add process tree information
     } else if (
       icolumn == ncolumn - 1 && dcolumn == 1 && irow < nrow - 1
     ) {
@@ -152,7 +207,7 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
       setFocusPosition({
         ...focusPosition,
         rowNodeId: rowNodeIds[irow + drow],
-        columnName: columnNames[icolumn + dcolumn]
+        columnName: columnNames[icolumn + dcolumn],
       });
     }
   };
@@ -161,6 +216,7 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
 
   return {
     focusPosition,
+    focusMode,
     setFocus,
     moveFocus,
   };

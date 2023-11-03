@@ -31,7 +31,8 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
 
   const {
     focusPosition,
-    setFocus
+    setFocus,
+    focusMode
   } = useTableCellFocus();
 
   return (
@@ -55,6 +56,7 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
                   nodes={nodes}
                   focusPosition={focusPosition}
                   setFocus={setFocus}
+                  focusMode={focusMode}
                 />
               </td>
             )}

@@ -1,28 +1,29 @@
 import React from 'react';
 
+import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 
+
 import { ProcessTreeNode } from './commonTypes';
-import { FocusPosition, SetFocusArgs } from './useTableCellFocus';
+import {
+  FocusPosition,
+  FocusMode,
+  SetFocusArgs
+} from './useTableCellFocus';
 
 import './TableView.scss';
-
-export type OnCellClickArgs = {
-  commonParentId: string;
-  commonProcessType: string;
-  rowNodeId: string;
-  columnName: string;
-}
 
 export type TableViewProps = {
   nodes: ProcessTreeNode[];
   focusPosition: FocusPosition|undefined;
+  focusMode: FocusMode;
   setFocus: (args: SetFocusArgs) => void;
 }
 
 const TableView: React.FC<TableViewProps> = ({
   nodes,
   focusPosition,
+  focusMode,
   setFocus,
 }) => {
 
@@ -35,6 +36,15 @@ const TableView: React.FC<TableViewProps> = ({
         && (node.process_type === focusPosition?.commonProcessType)
         && (node.process_id === focusPosition?.rowNodeId)
         && (columnName === focusPosition?.columnName);
+  };
+
+  const isSameAsLastFocus = (node: ProcessTreeNode, columnName: string): boolean => {
+    return (
+         (focusPosition?.commonParentId ?? "undefined") === (node.parent?.process_id ?? "undefined")
+      && focusPosition?.commonProcessType === node.process_type
+      && focusPosition?.rowNodeId === node.process_id
+      && focusPosition?.columnName === columnName
+    );
   };
 
   return (
@@ -74,10 +84,17 @@ const TableView: React.FC<TableViewProps> = ({
                   rowNodeId: node.process_id,
                   columnName: name,
                   rowNodeIds: nodes.map(node => node.process_id),
-                  columnNames: conditionNames
+                  columnNames: conditionNames,
+                  focusMode: isSameAsLastFocus(node, name) ? "Editing" : "Focused"
                 })}
               >
-                {node.conditions[name]}
+                {focusMode === "Editing" && checkIsCellFocused(node, name)
+                  ? <Form.Control
+                      size="sm"
+                      value={node.conditions[name]} 
+                    />
+                  : <div>{node.conditions[name]}</div>
+                }
               </td>
             )}
           </tr>
