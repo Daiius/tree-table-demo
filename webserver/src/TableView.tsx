@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
 
+import SmartCell from './SmartCell';
 
 import { ProcessTreeNode } from './commonTypes';
 import {
@@ -71,13 +71,14 @@ const TableView: React.FC<TableViewProps> = ({
             id={`node-${node.process_id}`}
           >
             {conditionNames.map(name =>
-              <td
-                className={
-                  checkIsCellFocused(node, name)
-                  ? "tableview-cell-focused"
-                  : "tableview-cell"
-                }
+              <SmartCell
                 key={name}
+                processType={node.process_type}
+                nodeId={node.process_id}
+                columnName={name}
+                initialValue={node.conditions[name]}
+                focused={checkIsCellFocused(node, name)}
+                focusMode={focusMode}
                 onClick={()=>setFocus({
                   commonParentId: nodes[0].parent?.process_id ?? "undefined",
                   commonProcessType: nodes[0].process_type,
@@ -87,15 +88,7 @@ const TableView: React.FC<TableViewProps> = ({
                   columnNames: conditionNames,
                   focusMode: isSameAsLastFocus(node, name) ? "Editing" : "Focused"
                 })}
-              >
-                {focusMode === "Editing" && checkIsCellFocused(node, name)
-                  ? <Form.Control
-                      size="sm"
-                      value={node.conditions[name]} 
-                    />
-                  : <div>{node.conditions[name]}</div>
-                }
-              </td>
+              />
             )}
           </tr>
         )}

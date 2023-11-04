@@ -83,9 +83,12 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
         case 'Escape':
           defocus();
           break;
-        case 'Shift':
-        case 'Alt':
-        case 'Control':
+        case 'AltLeft':
+        case 'AltRight':
+        case 'ControlLeft':
+        case 'ControlRight':
+        case 'ShiftLeft':
+        case 'ShiftRight':
           // do nothing
           break;
         default:
@@ -102,6 +105,22 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
       if (focusPosition== null) return;
       const key = e.code;
       switch (key) {
+        case e.shiftKey && 'Enter':
+        //case 'ArrowUp':
+          moveFocus({ drow: -1, dcolumn:  0 });
+          break;
+        case !e.shiftKey && 'Enter':
+        //case 'ArrowDown':
+          moveFocus({ drow:  1, dcolumn:  0 });
+          break;
+        case !e.shiftKey && 'Tab':
+          e.preventDefault();
+          moveFocus({ drow:  0, dcolumn:  1 });
+          break;
+        case e.shiftKey && 'Tab':
+          e.preventDefault();
+          moveFocus({ drow:  0, dcolumn: -1 });
+          break;
         case 'Escape':
           setFocus({
             ...focusPosition,
@@ -210,6 +229,8 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
         columnName: columnNames[icolumn + dcolumn],
       });
     }
+
+    setFocusMode("Focused");
   };
 
   const defocus = () => setFocusPosition(undefined);
