@@ -109,7 +109,8 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
         //case 'ArrowUp':
           moveFocus({ drow: -1, dcolumn:  0 });
           break;
-        case !e.shiftKey && 'Enter':
+        case e.keyCode !== 229 && !e.shiftKey && 'Enter':
+        // NOTE: avoiding IME complete enter key handling
         //case 'ArrowDown':
           moveFocus({ drow:  1, dcolumn:  0 });
           break;
