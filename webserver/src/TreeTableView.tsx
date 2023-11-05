@@ -18,7 +18,8 @@ export type TreeTableViewProps = {
 const TreeTableView: React.FC<TreeTableViewProps> = ({
   node
 }) => {
-
+  
+  // use table to show process tree groups
   const groupedNodes: ProcessTreeNode[][][] = [];
   recursiveGroupNodes({
     nodes: [node],
@@ -27,8 +28,10 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
     array: groupedNodes
   });
 
+  // draw arrows between parent-child processes
   useLeaderLine({rootNode: node});
-
+  
+  // handle table cell focus & edit position
   const {
     focusPosition,
     setFocus,

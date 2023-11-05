@@ -89,6 +89,7 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
         case 'ControlRight':
         case 'ShiftLeft':
         case 'ShiftRight':
+        case 'Backquote':
           // do nothing
           break;
         default:
@@ -96,7 +97,8 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
             ...focusPosition,
             rowNodeIds,
             columnNames,
-            focusMode: "Editing"});
+            focusMode: "Editing"
+          });
           break;
       }
     };
