@@ -33,13 +33,13 @@ const SmartCell: React.FC<SmartCellProps> = ({
     `(${processType},${nodeId},${columnName} : ${lastValue} -> ${value}`
   );
 
-  if (lastFocusMode === "Editing" && focusMode === "Focused") {
-    if (lastValue !== value) update();
-    setLastFocusMode("Focused");
-    setLastValue(value);
-  } else {
-    setLastFocusMode(focusMode);
-  }
+  //if (lastFocusMode === "Editing" && focusMode === "Focused") {
+  //  if (lastValue !== value) update();
+  //  setLastFocusMode("Focused");
+  //  setLastValue(value);
+  //} else {
+  //  setLastFocusMode(focusMode);
+  //}
 
   return (
     <td

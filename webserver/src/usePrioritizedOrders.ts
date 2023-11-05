@@ -62,7 +62,7 @@ export const usePrioritizedOrders = (): UsePrioritizedOrdersHookResult => {
             target.orderType = "Descending"
             break;
           case "Descending":
-            orderInfoList = orderInfoList.filter(orderInfo => orderInfo.columnName !== columnName);
+            orderInfoDict[key] = orderInfoList.filter(orderInfo => orderInfo.columnName !== columnName);
             break;
         }
       }
@@ -77,30 +77,33 @@ export const usePrioritizedOrders = (): UsePrioritizedOrdersHookResult => {
     for (const type of types) {
       const targetChildren = node.children.filter(child => child.process_type === type);
       const orderInfoList = getOrderInfo(node.process_id, type);
-      if (orderInfoList == null) {
-        sortedChildren.push(...targetChildren);
-        continue;
-      }
-      // applying sort according to orderInfoList
-      // NOTE: reverse() and sort() gives intended result.
-      orderInfoList.reverse();
-      for (const orderInfo of orderInfoList) {
-        // TODO : consider add type information to JSON...
-        // check column values are number or string
-        const isNumberColumn = node.children.map(child =>
-          child.conditions[orderInfo.columnName]
-        ).every(value => !isNaN(Number(value)));
-        
-        if (isNumberColumn) {
-          targetChildren.sort((a, b) =>
-            Number(a.conditions[orderInfo.columnName]) - Number(b.conditions[orderInfo.columnName])
-          );
-        } else {
-          targetChildren.sort((a, b) =>
-            a.conditions[orderInfo.columnName]?.localeCompare(b.conditions[orderInfo.columnName])
-          );
+      if (orderInfoList != null) {
+        // applying sort according to orderInfoList
+        // NOTE: reverse() and sort() gives intended result.
+        orderInfoList.reverse();
+        for (const orderInfo of orderInfoList) {
+          // TODO : consider add type information to JSON...
+          // check column values are number or string
+          const isNumberColumn = node.children.map(child =>
+            child.conditions[orderInfo.columnName]
+          ).every(value => !isNaN(Number(value)));
+          
+          if (isNumberColumn) {
+            targetChildren.sort((a, b) =>
+              (   Number(a.conditions[orderInfo.columnName])
+                - Number(b.conditions[orderInfo.columnName])
+              ) * (orderInfo.orderType === "Descending" ? -1 : 1)
+            );
+          } else {
+            targetChildren.sort((a, b) =>
+              a.conditions[orderInfo.columnName]?.localeCompare(
+                b.conditions[orderInfo.columnName]
+              ) * (orderInfo.orderType === "Descending" ? -1 : 1)
+            );
+          }
         }
       }
+      targetChildren.forEach(child => recursiveSortNode(child));
       sortedChildren.push(...targetChildren);
     }
     node.children = sortedChildren;

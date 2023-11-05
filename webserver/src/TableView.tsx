@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Table from 'react-bootstrap/Table';
+import Stack from 'react-bootstrap/Stack';
 
 import SmartCell from './SmartCell';
 import PrioritizedOrderMark from './PrioritizedOrderMark';
@@ -74,11 +75,13 @@ const TableView: React.FC<TableViewProps> = ({
                 columnName: name
               })}
             >
-              {name}
-              <PrioritizedOrderMark
-                orderInfo={orderInfoList?.find(orderInfo => orderInfo.columnName === name)}
-                priority={orderInfoList?.findIndex(orderInfo => orderInfo.columnName === name)}
-              />
+              <Stack direction="horizontal">
+                {name}
+                <PrioritizedOrderMark
+                  orderInfo={orderInfoList?.find(orderInfo => orderInfo.columnName === name)}
+                  priority={orderInfoList?.findIndex(orderInfo => orderInfo.columnName === name)}
+                />
+              </Stack>
             </th>
           )}
         </tr>

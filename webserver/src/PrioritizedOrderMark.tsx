@@ -18,13 +18,13 @@ type OrderMarkProps = {
 const OrderMarkUp: React.FC<OrderMarkProps> = ({
   orderType
 }) => orderType === "Descending"
-  ? <i className="bi bi-carret-up-fill"/>
-  : <i className="bi bi-carret-up"/>;
+  ? <i className="bi bi-caret-up-fill"/>
+  : <i className="bi bi-caret-up"/>;
 const OrderMarkDown: React.FC<OrderMarkProps> = ({
   orderType
 }) => orderType === "Ascending"
-  ? <i className="bi bi-carret-down-fill"/>
-  : <i className="bi bi-carret-down"/>;
+  ? <i className="bi bi-caret-down-fill"/>
+  : <i className="bi bi-caret-down"/>;
 
 const PrioritizedOrderMark: React.FC<PrioritizedOrderMarkProps> = ({
   orderInfo,
