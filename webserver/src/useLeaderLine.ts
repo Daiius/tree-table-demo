@@ -41,7 +41,7 @@ export const useLeaderLine = ({
       const leaderLine = new LeaderLine(
         from, to, {
           path: "straight", startSocket: "right", endSocket: "left",
-          color: "lightgray", size: 2
+          color: "lightgray", size: 2, startPlug: "disc", endPlug: "arrow3"
         });
       leaderLines.push(leaderLine);
     }

@@ -1,29 +1,37 @@
 import React from 'react';
 
 import Table from 'react-bootstrap/Table';
+import Stack from 'react-bootstrap/Stack';
+
+import SmartCell from './SmartCell';
+import PrioritizedOrderMark from './PrioritizedOrderMark';
 
 import { ProcessTreeNode } from './commonTypes';
-import { FocusPosition, SetFocusArgs } from './useTableCellFocus';
+import {
+  FocusPosition,
+  FocusMode,
+  SetFocusArgs
+} from './useTableCellFocus';
+import { OrderInfo, ToggleOrderArgs } from './usePrioritizedOrders';
 
 import './TableView.scss';
-
-export type OnCellClickArgs = {
-  commonParentId: string;
-  commonProcessType: string;
-  rowNodeId: string;
-  columnName: string;
-}
 
 export type TableViewProps = {
   nodes: ProcessTreeNode[];
   focusPosition: FocusPosition|undefined;
+  focusMode: FocusMode;
   setFocus: (args: SetFocusArgs) => void;
+  orderInfoList?: OrderInfo[];
+  toggleOrder: (args: ToggleOrderArgs) => void;
 }
 
 const TableView: React.FC<TableViewProps> = ({
   nodes,
   focusPosition,
+  focusMode,
   setFocus,
+  orderInfoList,
+  toggleOrder
 }) => {
 
   const conditionNames =
@@ -35,6 +43,15 @@ const TableView: React.FC<TableViewProps> = ({
         && (node.process_type === focusPosition?.commonProcessType)
         && (node.process_id === focusPosition?.rowNodeId)
         && (columnName === focusPosition?.columnName);
+  };
+
+  const isSameAsLastFocus = (node: ProcessTreeNode, columnName: string): boolean => {
+    return (
+         (focusPosition?.commonParentId ?? "undefined") === (node.parent?.process_id ?? "undefined")
+      && focusPosition?.commonProcessType === node.process_type
+      && focusPosition?.rowNodeId === node.process_id
+      && focusPosition?.columnName === columnName
+    );
   };
 
   return (
@@ -50,7 +67,22 @@ const TableView: React.FC<TableViewProps> = ({
       >
         <tr>
           {conditionNames.map(name =>
-            <th key={name}>{name}</th>
+            <th
+              key={name}
+              onClick={()=>toggleOrder({
+                commonParentId: nodes[0].parent?.process_id,
+                commonProcessType: nodes[0].process_type,
+                columnName: name
+              })}
+            >
+              <Stack direction="horizontal">
+                {name}
+                <PrioritizedOrderMark
+                  orderInfo={orderInfoList?.find(orderInfo => orderInfo.columnName === name)}
+                  priority={orderInfoList?.findIndex(orderInfo => orderInfo.columnName === name)}
+                />
+              </Stack>
+            </th>
           )}
         </tr>
       </thead>
@@ -61,24 +93,24 @@ const TableView: React.FC<TableViewProps> = ({
             id={`node-${node.process_id}`}
           >
             {conditionNames.map(name =>
-              <td
-                className={
-                  checkIsCellFocused(node, name)
-                  ? "tableview-cell-focused"
-                  : "tableview-cell"
-                }
+              <SmartCell
                 key={name}
+                processType={node.process_type}
+                nodeId={node.process_id}
+                columnName={name}
+                initialValue={node.conditions[name]}
+                focused={checkIsCellFocused(node, name)}
+                focusMode={focusMode}
                 onClick={()=>setFocus({
                   commonParentId: nodes[0].parent?.process_id ?? "undefined",
                   commonProcessType: nodes[0].process_type,
                   rowNodeId: node.process_id,
                   columnName: name,
                   rowNodeIds: nodes.map(node => node.process_id),
-                  columnNames: conditionNames
+                  columnNames: conditionNames,
+                  focusMode: isSameAsLastFocus(node, name) ? "Editing" : "Focused"
                 })}
-              >
-                {node.conditions[name]}
-              </td>
+              />
             )}
           </tr>
         )}
