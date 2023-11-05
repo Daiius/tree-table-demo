@@ -3,6 +3,7 @@ import React from 'react';
 import Table from 'react-bootstrap/Table';
 
 import SmartCell from './SmartCell';
+import PrioritizedOrderMark from './PrioritizedOrderMark';
 
 import { ProcessTreeNode } from './commonTypes';
 import {
@@ -10,6 +11,7 @@ import {
   FocusMode,
   SetFocusArgs
 } from './useTableCellFocus';
+import { OrderInfo, ToggleOrderArgs } from './usePrioritizedOrders';
 
 import './TableView.scss';
 
@@ -18,6 +20,8 @@ export type TableViewProps = {
   focusPosition: FocusPosition|undefined;
   focusMode: FocusMode;
   setFocus: (args: SetFocusArgs) => void;
+  orderInfoList?: OrderInfo[];
+  toggleOrder: (args: ToggleOrderArgs) => void;
 }
 
 const TableView: React.FC<TableViewProps> = ({
@@ -25,6 +29,8 @@ const TableView: React.FC<TableViewProps> = ({
   focusPosition,
   focusMode,
   setFocus,
+  orderInfoList,
+  toggleOrder
 }) => {
 
   const conditionNames =
@@ -60,7 +66,20 @@ const TableView: React.FC<TableViewProps> = ({
       >
         <tr>
           {conditionNames.map(name =>
-            <th key={name}>{name}</th>
+            <th
+              key={name}
+              onClick={()=>toggleOrder({
+                commonParentId: nodes[0].parent?.process_id,
+                commonProcessType: nodes[0].process_type,
+                columnName: name
+              })}
+            >
+              {name}
+              <PrioritizedOrderMark
+                orderInfo={orderInfoList?.find(orderInfo => orderInfo.columnName === name)}
+                priority={orderInfoList?.findIndex(orderInfo => orderInfo.columnName === name)}
+              />
+            </th>
           )}
         </tr>
       </thead>

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { ProcessTreeNode } from './commonTypes';
+
 export type OrderType = "Ascending" | "Descending"
 
 export type OrderInfo = {
@@ -12,25 +14,26 @@ export type OrderInfoDict = {
 }
 
 export type ToggleOrderArgs = {
-  commonParentId: string;
+  commonParentId: string|undefined;
   commonProcessType: string;
   columnName: string;
 };
 
 export type UsePrioritizedOrdersHookResult = {
-  getOrderInfo: (commonParentId: string, commonProcessType: string) => OrderInfo[];
+  getOrderInfo: (commonParentId: string|undefined, commonProcessType: string) => OrderInfo[];
   toggleOrder: (args: ToggleOrderArgs) => void;
+  recursiveSortNode: (node: ProcessTreeNode) => void;
 }
 
 const combineIdAndType = (
-  commonParentId: string,
+  commonParentId: string|undefined,
   commonProcessType: string
 ) => `${commonParentId}-${commonProcessType}`;
 
 export const usePrioritizedOrders = (): UsePrioritizedOrdersHookResult => {
   const [orderInfoDict, setOrderInfoDict] = useState<OrderInfoDict>({});
 
-  const getOrderInfo = (commonParentId: string, commonProcessType: string) => {
+  const getOrderInfo = (commonParentId: string|undefined, commonProcessType: string) => {
     const key = combineIdAndType(commonParentId, commonProcessType);
     return orderInfoDict[key];
   };
@@ -66,10 +69,47 @@ export const usePrioritizedOrders = (): UsePrioritizedOrdersHookResult => {
     }
     setOrderInfoDict({ ...orderInfoDict });
   };
+  // NOTE: modifies argument: node
+  const recursiveSortNode = (node: ProcessTreeNode) => {
+    // list up types of child nodes
+    const types = [...new Set(node.children.map(child => child.process_type))];
+    const sortedChildren: ProcessTreeNode[] = [];
+    for (const type of types) {
+      const targetChildren = node.children.filter(child => child.process_type === type);
+      const orderInfoList = getOrderInfo(node.process_id, type);
+      if (orderInfoList == null) {
+        sortedChildren.push(...targetChildren);
+        continue;
+      }
+      // applying sort according to orderInfoList
+      // NOTE: reverse() and sort() gives intended result.
+      orderInfoList.reverse();
+      for (const orderInfo of orderInfoList) {
+        // TODO : consider add type information to JSON...
+        // check column values are number or string
+        const isNumberColumn = node.children.map(child =>
+          child.conditions[orderInfo.columnName]
+        ).every(value => !isNaN(Number(value)));
+        
+        if (isNumberColumn) {
+          targetChildren.sort((a, b) =>
+            Number(a.conditions[orderInfo.columnName]) - Number(b.conditions[orderInfo.columnName])
+          );
+        } else {
+          targetChildren.sort((a, b) =>
+            a.conditions[orderInfo.columnName]?.localeCompare(b.conditions[orderInfo.columnName])
+          );
+        }
+      }
+      sortedChildren.push(...targetChildren);
+    }
+    node.children = sortedChildren;
+  };
 
   return {
     getOrderInfo,
-    toggleOrder
+    toggleOrder,
+    recursiveSortNode
   }
 };
 
