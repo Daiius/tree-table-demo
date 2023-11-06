@@ -57,6 +57,7 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
     // Cell focus mode, moving cells by keys
     const handleKeyDownFocus = (e: KeyboardEvent) => {
       if (focusPosition == null) return;
+      if (e.ctrlKey) return;
 
       const key = e.code;
       switch (key) {
