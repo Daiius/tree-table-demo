@@ -45,7 +45,7 @@ export const usePrioritizedOrders = (): UsePrioritizedOrdersHookResult => {
   }: ToggleOrderArgs) => {
     // NOTE : modifies orderInfoDict... should be copied...
     const key = combineIdAndType(commonParentId, commonProcessType);
-    let orderInfoList: OrderInfo[] | undefined = orderInfoDict[key];
+    const orderInfoList: OrderInfo[] | undefined = orderInfoDict[key];
     if (orderInfoList == null) {
       // First entry for given key
       orderInfoDict[key] = [{columnName, orderType: "Ascending"}];
