@@ -7,6 +7,8 @@ import {
   OrderType
 } from './usePrioritizedOrders';
 
+import './PrioritizedOrderMark.scss';
+
 export type PrioritizedOrderMarkProps = {
   orderInfo?: OrderInfo;
   priority?: number;
@@ -31,12 +33,15 @@ const PrioritizedOrderMark: React.FC<PrioritizedOrderMarkProps> = ({
   priority
 }) => {
   return (
-    <Stack direction="horizontal">
+    <Stack
+      className="prioritized-order-mark" 
+      direction="horizontal"
+    >
       <Stack>
         <OrderMarkUp orderType={orderInfo?.orderType} />
         <OrderMarkDown orderType={orderInfo?.orderType} />
       </Stack>
-      {(priority != null) && (priority !== -1) && <div>{priority}</div> }
+      {(priority != null) && (priority !== -1) && <div>{priority + 1}</div> }
     </Stack>
   );
 }

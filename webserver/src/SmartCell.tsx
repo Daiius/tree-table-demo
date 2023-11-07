@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import Form from 'react-bootstrap/Form';
+import Stack from 'react-bootstrap/Stack';
+
+import SyncStatusMark from './SyncStatusMark';
 
 import { FocusMode } from './useTableCellFocus';
+import { useAutoSyncCell } from './useAutoSyncCell';
 
 export type SmartCellProps = {
   processType: string;
@@ -24,22 +28,18 @@ const SmartCell: React.FC<SmartCellProps> = ({
   onClick
 }) => {
 
-  const [value, setValue] = useState<string>(initialValue);
-  const [lastValue, setLastValue] = useState<string>(initialValue);
-
-  const [lastFocusMode, setLastFocusMode] = useState<FocusMode>("Focused");
-  
-  const update = () => console.log(
-    `(${processType},${nodeId},${columnName} : ${lastValue} -> ${value}`
-  );
-
-  //if (lastFocusMode === "Editing" && focusMode === "Focused") {
-  //  if (lastValue !== value) update();
-  //  setLastFocusMode("Focused");
-  //  setLastValue(value);
-  //} else {
-  //  setLastFocusMode(focusMode);
-  //}
+  const {
+    value,
+    setValue,
+    status,
+    //errorMessage
+  } = useAutoSyncCell({
+    processType,
+    nodeId,
+    columnName,
+    initialValue,
+    focusMode
+  });
 
   return (
     <td
@@ -50,15 +50,18 @@ const SmartCell: React.FC<SmartCellProps> = ({
       }
       onClick={onClick}
     >
-      {focusMode === "Editing" && focused
-        ? <Form.Control
-            autoFocus
-            size="sm"
-            value={value}
-            onChange={(e)=>setValue(e.target.value)}
-          />
-        : <div>{value}</div>
-      }
+      <Stack direction="horizontal">
+        {focusMode === "Editing" && focused
+          ? <Form.Control
+              autoFocus
+              size="sm"
+              value={value}
+              onChange={(e)=>setValue(e.target.value)}
+            />
+          : <div>{value}</div>
+        }
+        <SyncStatusMark syncStatus={status} />
+      </Stack>
     </td>
   );
 };
