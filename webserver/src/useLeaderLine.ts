@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import LeaderLine from 'leader-line-new';
 
 import { ProcessTreeNode } from './commonTypes';
@@ -17,6 +17,8 @@ export type UseLeaderLineArgs = {
 export const useLeaderLine = ({
   rootNode
 }: UseLeaderLineArgs) => {
+
+  const [leaderLines, setLeaderLines] = useState<LeaderLine[]>([]);
   
   const connections: Connection[] = [];
   const recursiveAddConnection = (node: ProcessTreeNode) => {
@@ -30,8 +32,9 @@ export const useLeaderLine = ({
   };
   recursiveAddConnection(rootNode);
 
+  // re-create LeaderLines
   useEffect(() => {
-    const leaderLines: LeaderLine[] = [];
+    const tmp: LeaderLine[] = [];
     const scroller = document.getElementsByClassName("table-responsive")?.[0];
     if (scroller == null) return;
     for (const connection of connections) {
@@ -42,12 +45,14 @@ export const useLeaderLine = ({
         from, to, {
           path: "straight", startSocket: "right", endSocket: "left",
           color: "lightgray", size: 2, startPlug: "disc", endPlug: "arrow3"
-        });
-      leaderLines.push(leaderLine);
+        }
+      );
+      tmp.push(leaderLine);
     }
+    setLeaderLines(tmp);
 
     const onScroll = () => {
-      leaderLines.forEach(leaderLine => leaderLine.position());
+      tmp.forEach(leaderLine => leaderLine.position());
     };
     scroller.addEventListener(
       'scroll',
@@ -55,9 +60,14 @@ export const useLeaderLine = ({
     );
 
     return () => {
-      leaderLines.forEach(leaderLine => leaderLine.remove());
+      tmp.forEach(leaderLine => leaderLine.remove());
       scroller.removeEventListener('scroll', onScroll);
     };
-  }, [connections]);
+  }, [rootNode]);
+
+  // update position for every re-render
+  useEffect(() => {
+    leaderLines.forEach(leaderLine => leaderLine.position());
+  });
 };
 
