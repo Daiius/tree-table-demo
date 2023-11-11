@@ -8,7 +8,9 @@ values
   ('1', 'cutting', '0'),
   ('2', 'drying', '1'),
   ('3', 'drying', '1'),
-  ('4', 'drying', '1')
+  ('4', 'drying', '1'),
+	('5', 'drying', '1'),
+	('6', 'drying', '1')
 ;
 
 insert
@@ -31,7 +33,9 @@ insert
 values
   ('2', 120, 300, 'Alice'),
   ('3', 140, 300, 'Alice'),
-  ('4', 160, 300, 'Alice')
+  ('4', 160, 300, 'Alice'),
+	('5', 160, 310, 'Alice'),
+	('6', 160, 320, 'Alice')
 ;
 
 insert
