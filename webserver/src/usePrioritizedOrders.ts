@@ -82,7 +82,7 @@ export const usePrioritizedOrders = (): UsePrioritizedOrdersHookResult => {
         // NOTE: reverse() and sort() gives intended result.
         const copiedOrderInfoList = [...orderInfoList];
         copiedOrderInfoList.reverse();
-        for (const orderInfo of orderInfoList) {
+        for (const orderInfo of copiedOrderInfoList) {
           // TODO : consider add type information to JSON...
           // check column values are number or string
           const isNumberColumn = node.children.map(child =>
