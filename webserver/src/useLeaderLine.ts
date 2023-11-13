@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import LeaderLine from 'leader-line-new';
 
 import { ProcessTreeNode } from './commonTypes';
@@ -10,15 +10,18 @@ export type Connection = {
 
 export type UseLeaderLineArgs = {
   rootNode: ProcessTreeNode;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	dependencies: any[];
 }
 
 
 
 export const useLeaderLine = ({
-  rootNode
+  rootNode,
+	dependencies
 }: UseLeaderLineArgs) => {
 
-  const [leaderLines, setLeaderLines] = useState<LeaderLine[]>([]);
+  const leaderLinesRef = useRef<LeaderLine[]>([]);
   
   const connections: Connection[] = [];
   const recursiveAddConnection = (node: ProcessTreeNode) => {
@@ -34,7 +37,13 @@ export const useLeaderLine = ({
 
   // re-create LeaderLines
   useEffect(() => {
-    const tmp: LeaderLine[] = [];
+
+		// delete existing LeaderLines
+		leaderLinesRef.current.forEach(ll => ll.remove());
+		leaderLinesRef.current = [];
+
+		// re-create LeaderLines
+
     const scroller = document.getElementsByClassName("table-responsive")?.[0];
     if (scroller == null) return;
     for (const connection of connections) {
@@ -47,27 +56,30 @@ export const useLeaderLine = ({
           color: "lightgray", size: 2, startPlug: "disc", endPlug: "arrow3"
         }
       );
-      tmp.push(leaderLine);
+      leaderLinesRef.current.push(leaderLine);
     }
-    setLeaderLines(tmp);
 
     const onScroll = () => {
-      tmp.forEach(leaderLine => leaderLine.position());
+      leaderLinesRef.current.forEach(ll => ll.position());
     };
+
     scroller.addEventListener(
       'scroll',
       onScroll
     );
 
     return () => {
-      tmp.forEach(leaderLine => leaderLine.remove());
       scroller.removeEventListener('scroll', onScroll);
+      leaderLinesRef.current.forEach(ll => ll.remove());
+			leaderLinesRef.current = [];
     };
-  }, [rootNode]);
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  }, [rootNode, ...dependencies]);
 
-  // update position for every re-render
-  useEffect(() => {
-    leaderLines.forEach(leaderLine => leaderLine.position());
-  });
+	// position LeaderLines in each re-render (it supposed to be some layout is changed...)
+	useEffect(() => {
+		leaderLinesRef.current.forEach(ll => ll.position());
+	});
+
 };
 

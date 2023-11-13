@@ -31,6 +31,7 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
 
   // order columns with prioritization
   const {
+		orderInfoDict,
     getOrderInfo,
     toggleOrder,
     recursiveSortNode
@@ -47,7 +48,10 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
   });
 
   // draw arrows between parent-child processes
-  useLeaderLine({rootNode: node});
+  useLeaderLine({
+		rootNode: node,
+		dependencies: [orderInfoDict]
+	});
 
   return (
     <Table
@@ -58,26 +62,30 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
       <tbody>
         {groupedNodes.map((row, irow) =>
           <tr key={irow}>
-            {row.map((nodes, inodes) =>
-              <td key={inodes}>
-                <div>
-                  type: {nodes[0].process_type}
-                </div>
-                <div>
-                  number of nodes: {nodes.length}
-                </div>
-                <TableView
-                  nodes={nodes}
-                  focusPosition={focusPosition}
-                  setFocus={setFocus}
-                  focusMode={focusMode}
-                  orderInfoList={getOrderInfo(
-                    nodes[0].parent?.process_id,
-                    nodes[0].process_type
-                  )}
-                  toggleOrder={toggleOrder}
-                />
-              </td>
+						{/* column in row might be undefined, but should not be skipped... */}
+            {[...Array(row.length).keys()].map((_, inodes) =>
+							row[inodes] 
+                ? <td key={inodes}>
+										<div>
+											type: {row[inodes][0].process_type}
+										</div>
+										<div>
+											number of nodes: {row[inodes].length}
+										</div>
+										<TableView
+											nodes={row[inodes]}
+											focusPosition={focusPosition}
+											setFocus={setFocus}
+											focusMode={focusMode}
+											orderInfoList={getOrderInfo(
+												row[inodes][0].parent?.process_id,
+												row[inodes][0].process_type
+											)}
+											toggleOrder={toggleOrder}
+										/>
+									</td>
+								: <td></td>
+							
             )}
           </tr>
         )}

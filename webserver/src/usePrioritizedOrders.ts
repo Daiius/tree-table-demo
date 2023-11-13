@@ -20,6 +20,7 @@ export type ToggleOrderArgs = {
 };
 
 export type UsePrioritizedOrdersHookResult = {
+  orderInfoDict: OrderInfoDict;
   getOrderInfo: (commonParentId: string|undefined, commonProcessType: string) => OrderInfo[];
   toggleOrder: (args: ToggleOrderArgs) => void;
   recursiveSortNode: (node: ProcessTreeNode) => void;
@@ -111,6 +112,7 @@ export const usePrioritizedOrders = (): UsePrioritizedOrdersHookResult => {
   };
 
   return {
+    orderInfoDict,
     getOrderInfo,
     toggleOrder,
     recursiveSortNode
