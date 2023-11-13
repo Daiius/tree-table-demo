@@ -1,7 +1,7 @@
 from typing import reveal_type
 import json
 
-from flask import Flask
+from flask import Flask, session, request
 from flask_cors import CORS
 
 import pymysql
@@ -20,6 +20,9 @@ cors = CORS(
     }
   }
 )
+app.secret_key = b'this key should be really secret in the production code!!!'
+
+active_ids: list[str] = []
 
 def connect(is_testing: bool) -> pymysql.connections.Connection:
     #print("app.testing: ", is_testing)
@@ -39,6 +42,32 @@ def connect(is_testing: bool) -> pymysql.connections.Connection:
 
 def make_json(data) -> bytes:
     return json.dumps(data).encode('utf-8')
+
+@app.route("/api/login", methods=['GET', 'POST'])
+def login() -> tuple[bytes, int]:
+    """
+    handles login
+    """
+    if request.method == 'GET':
+        if ("id" in session.keys()) and (session["id"] in active_ids):
+            return make_json("you are an active user!"), 200
+        else:
+            return make_json("login required!"), 401
+    elif request.method == 'POST':
+        data = json.loads(request.get_data())
+        username = data["username"]
+        password = data["password"]
+
+        # TODO test implementation
+        if username == password:
+            # login success!
+            active_ids.append(username)
+            session["id"] = username
+            return make_json("login success!"), 200
+        else:
+            return make_json("login failed..."), 403
+    
+    return make_json("unexpected request type."), 500
 
 @app.route("/api/processes", methods=["GET"])
 def get_process_list() -> tuple[bytes, int]:
