@@ -1,7 +1,9 @@
 import React from 'react';
 
+import Alert from 'react-bootstrap/Alert';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import SimpleTreeView from './SimpleTreeView';
 import TreeTableView from './TreeTableView';
@@ -33,9 +35,17 @@ const MainView = () => {
         />
       </Tab>
       <Tab eventKey="tree-table-view" title="TreeTableView">
-        <TreeTableView
-          node={convertProcesTreeNodeData(data[0])}
-        />
+				<ErrorBoundary 
+					fallback={
+						<Alert>
+							Error occurred while rendering component...
+						</Alert>
+					}
+				>
+					<TreeTableView
+						node={convertProcesTreeNodeData(data[0])}
+					/>
+				</ErrorBoundary>
       </Tab>
     </Tabs>
   );
