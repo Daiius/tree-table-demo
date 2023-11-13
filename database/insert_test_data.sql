@@ -10,7 +10,8 @@ values
   ('3', 'drying', '1'),
   ('4', 'drying', '1'),
 	('5', 'drying', '1'),
-	('6', 'drying', '1')
+	('6', 'drying', '1'),
+	('7', 'cutting', '0')
 ;
 
 insert
@@ -24,7 +25,8 @@ insert
   cutting
   (process_id, tool, operator)
 values
-  ('1', 'knife', 'Alice')
+  ('1', 'knife', 'Alice'),
+	('7', 'knife', 'Bob')
 ;
 
 insert
