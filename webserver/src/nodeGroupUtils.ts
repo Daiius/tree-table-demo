@@ -35,8 +35,8 @@ export const recursiveGroupNodes = ({
         icolumn: icolumn + 1,
         array
       });
+      irowOffset++;
     }
-    irowOffset++;
   }
 
   return irowOffset;
