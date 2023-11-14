@@ -1,7 +1,11 @@
 const path = require('path');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
-  entry: './src/main.tsx',
+  entry: {
+    bundle: './src/main.tsx',
+    login_bundle: './src/login/main.tsx',
+  },
   mode: 'development',
   devtool: "inline-source-map",
   module: {
@@ -34,9 +38,10 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.woff', '.woff2', '.css', '.scss'],
+    plugins: [new TsconfigPathsPlugin()]
   },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
   },
 };
