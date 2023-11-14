@@ -11,6 +11,13 @@ class WebApiServerTest(unittest.TestCase):
         # not like HTTP error message by default Flask error handler.
         self.app.testing = True
         #print("self.app.testing = True")
+        self.client.post(
+            "/api/login",
+            json = {
+                "password": "test",
+                "username": "test"
+            }
+        )
 
     def test_get_process_list(self):
         response = self.client.get("/processes")
@@ -22,6 +29,10 @@ class WebApiServerTest(unittest.TestCase):
 
     def test_get_processes_trees(self):
         response = self.client.get("/processes/trees/0")
+        data = response.get_json()
+
+    def test_get_login(self):
+        response = self.client.get("/api/login")
         data = response.get_json()
 
 if __name__ == '__main__':

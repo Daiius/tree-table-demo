@@ -24,6 +24,7 @@
     "webpack-cli": "^5.1.4",
     "eslint": "^8.52.0",
     "@typescript-eslint/parser": "^6.9.0",
-    "@typescript-eslint/eslint-plugin": "^6.9.0"
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "tsconfig-paths-webpack-plugin": "^4.1.0"
   }
 }
