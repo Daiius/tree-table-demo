@@ -18,7 +18,10 @@ from webapi_server_helper import (
 
 from flask_login import ( # type: ignore
   login_required,
-  LoginManager
+  LoginManager,
+  UserMixin,
+  current_user,
+  login_user
 )
 
 app = Flask(__name__)
@@ -37,8 +40,6 @@ app.secret_key = b'this key should be really secret in the production code!!!'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-active_ids: list[str] = []
 
 def connect(is_testing: bool) -> pymysql.connections.Connection:
     #print("app.testing: ", is_testing)
@@ -59,14 +60,9 @@ def connect(is_testing: bool) -> pymysql.connections.Connection:
 def make_json(data) -> bytes:
     return json.dumps(data).encode('utf-8')
 
-class User:
-    def __init__(self, id: str):
-        self.id = id
-        self.is_authenticated = True
-        self.is_active = True
-        self.is_anonymous = False
-    def get_id(self) -> str:
-        return self.id
+class User(UserMixin):
+    def __init__(self, user_id: str):
+        self.id = user_id
 
 @login_manager.user_loader
 def load_user(user_id: str) -> User:
@@ -75,10 +71,7 @@ def load_user(user_id: str) -> User:
 @app.route("/api/login", methods=["GET"])
 @login_required
 def get_login() -> tuple[bytes, int]:
-    if session.get("id") in active_ids:
-        return make_json("you are an active user!"), 200
-    else:
-        return make_json("login required!"), 401
+    return make_json("you are an active user!"), 200
 
 @app.route("/api/login", methods=['POST'])
 def post_login() -> tuple[bytes, int]:
@@ -91,8 +84,7 @@ def post_login() -> tuple[bytes, int]:
     # TODO test implementation
     if username == password:
         # login success!
-        active_ids.append(username)
-        session["id"] = username
+        login_user(User(username))
         return make_json("login success!"), 200
     else:
         return make_json("login failed..."), 403
