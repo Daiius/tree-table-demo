@@ -24,9 +24,9 @@ const sleep = async (
 ): Promise<void> => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 export const useAutoSyncCell = ({
-  //processType,
-  //nodeId,
-  //columnName,
+  processType,
+  nodeId,
+  columnName,
   initialValue,
   focusMode
 }: UseAutoSyncCellArgs) => {
@@ -34,6 +34,7 @@ export const useAutoSyncCell = ({
   const [lastValue, setLastValue] = useState<string>(initialValue);
   const [lastFocusMode, setLastFocusMode] = useState<FocusMode>("Focused");
   const [status, setStatus] = useState<SyncStatus>("OK");
+  const [errorMessage, setErrorMessage] = useState<string|undefined>();
 
   // update cell data when focus changed from Editing -> Focused
   useEffect(() => {
@@ -43,8 +44,27 @@ export const useAutoSyncCell = ({
           setStatus("Updating");
           await sleep(1000);
           //await updateCondition();
-          setStatus("Updated");
-          setLastValue(value);
+          try {
+            const response = await fetch(
+              `http://localhost/api/process/${processType}/${nodeId}`,
+              {
+                method: 'PUT',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ [columnName]: value })
+              }
+            );
+            if (!response.ok) throw Error("Error occurred during fetch, " + response.statusText);
+            setStatus("Updated");
+            setLastValue(value);
+            setErrorMessage(undefined);
+          } catch (e) {
+            setStatus("Error");
+            if (e instanceof Error) {
+              setErrorMessage(e.toString());
+            } else {
+              setErrorMessage("unknown error during fetch...");
+            }
+          }
         }
       }
       setLastFocusMode(focusMode);
@@ -64,11 +84,18 @@ export const useAutoSyncCell = ({
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     asyncFunc();
   }, [status]);
+
+  // update initial value when background update
+  useEffect(() => {
+    setValue(initialValue);
+    setLastValue(initialValue);
+    setStatus("Updated");
+  }, [initialValue]);
   
   return {
     value,
     setValue,
     status,
-    errorMessage: "test"
+    errorMessage
   };
 };
