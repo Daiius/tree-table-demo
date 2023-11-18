@@ -266,3 +266,25 @@ def build_json(
     
     return result
 
+def update_process(
+  process_type: str,
+  process_id: str,
+  data: dict[str, str],
+  connection: pymysql.connections.Connection
+):
+  # get target table name
+  with connection.cursor() as cursor:
+    cursor.execute(
+      "select table_name from process_master where process_type = %s",
+      process_type
+    )
+    table_name = cursor.fetchone()["table_name"]
+  # update target table
+  set_sql_list = [f"{k} = %s" for k in data.keys()]
+  with connection.cursor() as cursor:
+    cursor.execute(
+      f"update {table_name} set {', '.join(set_sql_list)} where process_id = %s",
+      list(data.values()) + [process_id]
+    )
+  connection.commit()
+

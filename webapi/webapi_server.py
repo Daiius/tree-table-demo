@@ -11,6 +11,7 @@ from flask_cors import CORS
 
 import pymysql
 
+import webapi_server_helper
 from webapi_server_helper import (
   build_json,
   ProcessTreeNode
@@ -53,7 +54,9 @@ def connect(is_testing: bool) -> pymysql.connections.Connection:
         user = "root",
         password = "tree-table-demo-database-mysql-root-password",
         database = "tree_table_demo",
-        cursorclass = pymysql.cursors.DictCursor
+        cursorclass = pymysql.cursors.DictCursor,
+        read_timeout = 5,
+        write_timeout = 5
     )
     
 
@@ -117,6 +120,22 @@ def get_process_tree(ids: str) -> tuple[bytes, int]:
     ids_list = ids.split(";")
     result = build_json(connection, ids_list)
     return make_json(result), 200
+
+@app.route("/api/process/<string:process_type>/<string:process_id>", methods=["PUT"])
+def update_process(process_type: str, process_id: str) -> tuple[bytes, int]:
+  """
+    body: { "conditionName": "value" }
+  """
+  data = request.get_json()
+  connection = connect(app.testing)
+  webapi_server_helper.update_process(
+    process_type = process_type,
+    process_id = process_id,
+    data = data,
+    connection = connection
+  )
+  return make_json(data), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8000)
