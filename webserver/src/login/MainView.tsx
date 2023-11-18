@@ -6,6 +6,8 @@ import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import Stack from 'react-bootstrap/Stack';
 
+import './MainView.scss';
+
 const MainView: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -33,7 +35,7 @@ const MainView: React.FC = () => {
   };
 
   return (
-    <Card>
+    <Card className="login-form-card">
       <Card.Header>Tree Table Demo Login</Card.Header>
       <Card.Body>
         <Stack gap={2}>
@@ -56,9 +58,10 @@ const MainView: React.FC = () => {
           <Button
             className="ms-auto"
             variant="outline-primary"
-            onClick={handleLogin}
+            onClick={void handleLogin}
           >
             <i className="bi bi-door-open"/>
+            Login
           </Button>
         </Stack>
       </Card.Body>

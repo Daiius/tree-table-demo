@@ -8,19 +8,15 @@ import { ErrorBoundary } from 'react-error-boundary';
 import SimpleTreeView from './SimpleTreeView';
 import TreeTableView from './TreeTableView';
 
-import { useFetch } from './useFetch';
-
-import { ProcessTreeNode, convertProcesTreeNodeData } from './commonTypes';
+import { useProcessData } from 'useProcessData';
 
 const MainView = () => {
+  
+  const { node } = useProcessData();
 
-  const { data } = useFetch<ProcessTreeNode[]>(
-    "http://localhost/api/processes/trees/0"
-  );
+  console.log(node);
 
-  console.log(data);
-
-  if (data == null) return <div>loading...</div>;
+  if (node == null) return <div>loading...</div>;
 
   return (
     <Tabs
@@ -30,7 +26,7 @@ const MainView = () => {
     >
       <Tab eventKey="simple-tree-view" title="SimpleTreeView">
         <SimpleTreeView
-          node={convertProcesTreeNodeData(data[0])}
+          node={node}
           depth={0}
         />
       </Tab>
@@ -43,7 +39,7 @@ const MainView = () => {
 					}
 				>
 					<TreeTableView
-						node={convertProcesTreeNodeData(data[0])}
+						node={node}
 					/>
 				</ErrorBoundary>
       </Tab>
