@@ -8,7 +8,7 @@ export interface ProcessTreeNode {
   children: ProcessTreeNode[];
 }
 
-export const convertProcesTreeNodeData = (
+export const jsonToProcessTreeNode = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
   parent?: ProcessTreeNode
@@ -21,8 +21,9 @@ export const convertProcesTreeNodeData = (
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   convertedNode.children = data.children.map((childData: any) =>
-    convertProcesTreeNodeData(childData, convertedNode)
+    jsonToProcessTreeNode(childData, convertedNode)
   );
 
   return convertedNode;
 };
+
