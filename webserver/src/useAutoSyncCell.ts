@@ -35,6 +35,9 @@ export const useAutoSyncCell = ({
   const [lastFocusMode, setLastFocusMode] = useState<FocusMode>("Focused");
   const [status, setStatus] = useState<SyncStatus>("OK");
   const [errorMessage, setErrorMessage] = useState<string|undefined>();
+  
+  // to detect initialValue (from database) is changed
+  const [lastInitialValue, setLastInitialValue] = useState<string>(initialValue);
 
   // update cell data when focus changed from Editing -> Focused
   useEffect(() => {
@@ -50,7 +53,12 @@ export const useAutoSyncCell = ({
               {
                 method: 'PUT',
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ [columnName]: value })
+                body: JSON.stringify({
+                  [columnName]: {
+                    "newValue": value,
+                    "oldValue": lastValue
+                  } 
+                })
               }
             );
             if (!response.ok) throw Error("Error occurred during fetch, " + response.statusText);
@@ -87,9 +95,13 @@ export const useAutoSyncCell = ({
 
   // update initial value when background update
   useEffect(() => {
-    setValue(initialValue);
-    setLastValue(initialValue);
-    setStatus("Updated");
+    if (initialValue != lastInitialValue) {
+      setValue(initialValue);
+      setLastValue(initialValue);
+      setStatus("Updated");
+
+      setLastInitialValue(initialValue);
+    }
   }, [initialValue]);
   
   return {

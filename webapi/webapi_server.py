@@ -124,7 +124,13 @@ def get_process_tree(ids: str) -> tuple[bytes, int]:
 @app.route("/api/process/<string:process_type>/<string:process_id>", methods=["PUT"])
 def update_process(process_type: str, process_id: str) -> tuple[bytes, int]:
   """
-    body: { "conditionName": "value" }
+    body: {
+      "conditionName1": {
+        "newValue1": "value",
+        "oldValue1": "to detect conflict by multi user editing"
+      },
+      ...
+    }
   """
   data = request.get_json()
   connection = connect(app.testing)

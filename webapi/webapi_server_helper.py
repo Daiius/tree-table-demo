@@ -280,11 +280,13 @@ def update_process(
     )
     table_name = cursor.fetchone()["table_name"]
   # update target table
-  set_sql_list = [f"{k} = %s" for k in data.keys()]
+  sql_list = [f"{k} = %s" for k in data.keys()]
   with connection.cursor() as cursor:
     cursor.execute(
-      f"update {table_name} set {', '.join(set_sql_list)} where process_id = %s",
-      list(data.values()) + [process_id]
+      f"update {table_name} set {', '.join(sql_list)} where process_id = %s and {' and '.join(sql_list)}",
+      [d["newValue"] for d in data.values()] \
+      + [process_id] \
+      + [d["oldValue"] for d in data.values()]
     )
   connection.commit()
 
