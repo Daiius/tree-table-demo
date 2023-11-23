@@ -71,12 +71,12 @@ class User(UserMixin):
 def load_user(user_id: str) -> User:
     return User(user_id)
  
-@app.route("/api/login", methods=["GET"])
+@app.get("/api/login")
 @login_required
 def get_login() -> tuple[bytes, int]:
     return make_json("you are an active user!"), 200
 
-@app.route("/api/login", methods=['POST'])
+@app.post("/api/login")
 def post_login() -> tuple[bytes, int]:
     data = json.loads(request.get_data())
     username = data["username"]
@@ -95,7 +95,7 @@ def post_login() -> tuple[bytes, int]:
     return make_json("unexpected request type."), 500
 
 
-@app.route("/api/processes", methods=["GET"])
+@app.get("/api/processes")
 def get_process_list() -> tuple[bytes, int]:
     connection = connect(app.testing)
     with connection.cursor() as cursor:
@@ -103,7 +103,7 @@ def get_process_list() -> tuple[bytes, int]:
         result = cursor.fetchall()
     return make_json(result), 200
 
-@app.route("/api/processes/roots", methods=["GET"])
+@app.get("/api/processes/roots")
 def get_process_roots() -> tuple[bytes, int]:
     connection = connect(app.testing)
     with connection.cursor() as cursor:
@@ -111,7 +111,7 @@ def get_process_roots() -> tuple[bytes, int]:
         result = cursor.fetchall()
     return make_json(result), 200
 
-@app.route("/api/processes/trees/<string:ids>", methods=["GET"])
+@app.get("/api/processes/trees/<string:ids>")
 def get_process_tree(ids: str) -> tuple[bytes, int]:
     """
     ids: semicolon separated process ids
@@ -121,7 +121,7 @@ def get_process_tree(ids: str) -> tuple[bytes, int]:
     result = build_json(connection, ids_list)
     return make_json(result), 200
 
-@app.route("/api/process/<string:process_type>/<string:process_id>", methods=["PUT"])
+@app.put("/api/process/<string:process_type>/<string:process_id>")
 def update_process(process_type: str, process_id: str) -> tuple[bytes, int]:
   """
     body: {
