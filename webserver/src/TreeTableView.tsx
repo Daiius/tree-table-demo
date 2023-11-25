@@ -66,12 +66,6 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
             {[...Array(row.length).keys()].map((_, inodes) =>
 							row[inodes] 
                 ? <td key={inodes}>
-										<div>
-											type: {row[inodes][0].process_type}
-										</div>
-										<div>
-											number of nodes: {row[inodes].length}
-										</div>
 										<TableView
 											nodes={row[inodes]}
 											focusPosition={focusPosition}

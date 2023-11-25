@@ -1,5 +1,6 @@
 import React from 'react';
 
+import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
 import Stack from 'react-bootstrap/Stack';
 
@@ -12,7 +13,10 @@ import {
   FocusMode,
   SetFocusArgs
 } from './useTableCellFocus';
-import { OrderInfo, ToggleOrderArgs } from './usePrioritizedOrders';
+import {
+  OrderInfo,
+  ToggleOrderArgs
+} from './usePrioritizedOrders';
 
 import './TableView.scss';
 
@@ -55,67 +59,72 @@ const TableView: React.FC<TableViewProps> = ({
   };
 
   return (
-    <Table
-      className="tableview-main-table"
-      bordered
-      striped
-      hover
-      size="sm"
-    >
-      <thead
-        id={`group-${nodes[0].parent?.process_id}`}
-      >
-        <tr>
-          {conditionNames.map(name =>
-            <th
-              key={name}
-              onClick={()=>toggleOrder({
-                commonParentId: nodes[0].parent?.process_id,
-                commonProcessType: nodes[0].process_type,
-                columnName: name
-              })}
-            >
-              <Stack direction="horizontal">
-                {name}
-                <PrioritizedOrderMark
-                  orderInfo={orderInfoList?.find(orderInfo => orderInfo.columnName === name)}
-                  priority={orderInfoList?.findIndex(orderInfo => orderInfo.columnName === name)}
-                />
-              </Stack>
-            </th>
-          )}
-        </tr>
-      </thead>
-      <tbody>
-        {nodes.map(node =>
-          <tr
-            key={node.process_id}
-            id={`node-${node.process_id}`}
+    <Card>
+      <Card.Header>{nodes[0].process_type} x {nodes.length}</Card.Header>
+      <Card.Body>
+        <Table
+          className="tableview-main-table"
+          bordered
+          striped
+          hover
+          size="sm"
+        >
+          <thead
+            id={`group-${nodes[0].parent?.process_id}`}
           >
-            {conditionNames.map(name =>
-              <SmartCell
-                key={name}
-                processType={node.process_type}
-                nodeId={node.process_id}
-                columnName={name}
-                initialValue={node.conditions[name]}
-                focused={checkIsCellFocused(node, name)}
-                focusMode={focusMode}
-                onClick={()=>setFocus({
-                  commonParentId: nodes[0].parent?.process_id ?? "undefined",
-                  commonProcessType: nodes[0].process_type,
-                  rowNodeId: node.process_id,
-                  columnName: name,
-                  rowNodeIds: nodes.map(node => node.process_id),
-                  columnNames: conditionNames,
-                  focusMode: isSameAsLastFocus(node, name) ? "Editing" : "Focused"
-                })}
-              />
+            <tr>
+              {conditionNames.map(name =>
+                <th
+                  key={name}
+                  onClick={()=>toggleOrder({
+                    commonParentId: nodes[0].parent?.process_id,
+                    commonProcessType: nodes[0].process_type,
+                    columnName: name
+                  })}
+                >
+                  <Stack direction="horizontal">
+                    {name}
+                    <PrioritizedOrderMark
+                      orderInfo={orderInfoList?.find(orderInfo => orderInfo.columnName === name)}
+                      priority={orderInfoList?.findIndex(orderInfo => orderInfo.columnName === name)}
+                    />
+                  </Stack>
+                </th>
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {nodes.map(node =>
+              <tr
+                key={node.process_id}
+                id={`node-${node.process_id}`}
+              >
+                {conditionNames.map(name =>
+                  <SmartCell
+                    key={name}
+                    processType={node.process_type}
+                    nodeId={node.process_id}
+                    columnName={name}
+                    initialValue={node.conditions[name]}
+                    focused={checkIsCellFocused(node, name)}
+                    focusMode={focusMode}
+                    onClick={()=>setFocus({
+                      commonParentId: nodes[0].parent?.process_id ?? "undefined",
+                      commonProcessType: nodes[0].process_type,
+                      rowNodeId: node.process_id,
+                      columnName: name,
+                      rowNodeIds: nodes.map(node => node.process_id),
+                      columnNames: conditionNames,
+                      focusMode: isSameAsLastFocus(node, name) ? "Editing" : "Focused"
+                    })}
+                  />
+                )}
+              </tr>
             )}
-          </tr>
-        )}
-      </tbody>
-    </Table>
+          </tbody>
+        </Table>
+      </Card.Body>
+    </Card>
   );
 };
 
