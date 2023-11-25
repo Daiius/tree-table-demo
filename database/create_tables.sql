@@ -1,16 +1,18 @@
 create table process_master (
   process_type varchar(20) not null,
   table_name varchar(20) not null,
+  image_color varchar(20) default 'white',
   -- we need index for foreign key reference
   unique index (process_type)
 );
 
 insert
   process_master
+  (process_type, table_name, image_color)
 values
-  ("material", "material"), 
-  ("cutting", "cutting"), 
-  ("drying", "drying")
+  ("material", "material", "mistyrose"), 
+  ("cutting", "cutting", "whitesmoke"), 
+  ("drying", "drying", "bisque")
 ;
 
 create table process_list (
