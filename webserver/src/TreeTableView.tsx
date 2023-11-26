@@ -6,10 +6,9 @@ import TableView from './TableView';
 // Custom functions
 import { ProcessTreeNode } from './commonTypes';
 import { recursiveGroupNodes } from './nodeGroupUtils';
-// Custom hooks
-//import { useLeaderLine } from './useLeaderLine';
 
 import Arrow, { ArrowProps, Point } from './Arrow';
+import { useArrows } from './useArrows';
 
 import { useTableCellFocus } from './useTableCellFocus';
 import { usePrioritizedOrders } from './usePrioritizedOrders';
@@ -51,43 +50,12 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
     array: groupedNodes
   });
 
-  // draw arrows between parent-child processes
-  //useLeaderLine({
-	//	rootNode: node,
-	//	dependencies: [orderInfoDict]
-	//});
-
   if (refTable == null) return <div>Rendering...</div>;
  
-  const connections: {[key: string]: ArrowProps} = {};
-  const recursiveAddConnections = (node: ProcessTreeNode) => {
-    for (const child of node.children) {
-      const fromId = `node-${node.process_id}`;
-      const toId = `group-${node.process_id}`;
-
-      const fromElement = document.getElementById(fromId);
-      const toElement = document.getElementById(toId);
-      if (fromElement == null || toElement == null || refTable.current == null) continue;
-
-      const refTableRect = refTable.current.getBoundingClientRect();
-      const fromRect = fromElement.getBoundingClientRect();
-      const toRect = toElement.getBoundingClientRect();
-
-      const from: Point = {
-        x: fromRect.right - refTableRect.left,
-        y: fromRect.top - refTableRect.top + fromRect.height / 2
-      };
-      const to: Point = {
-        x: toRect.left - refTableRect.left,
-        y: toRect.top - refTableRect.top + toRect.height / 2
-      };
-
-      connections[`${fromId};${toId}`] = { from, to };
-
-      recursiveAddConnections(child);
-    }
-  };
-  recursiveAddConnections(node);
+  const { connections } = useArrows({
+    node,
+    container: refTable.current
+  });
 
   return (
     <div
