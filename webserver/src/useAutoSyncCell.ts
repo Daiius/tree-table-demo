@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 
 import { FocusMode } from './useTableCellFocus';
 
+import { sleep } from './commonTypes';
+
 export type SyncStatus = "OK" | "Updating" | "Updated" | "Error"
 
 export type UseAutoSyncCellArgs = {
@@ -19,9 +21,6 @@ export type UseAutoSyncCellHookResult = {
   errorMessage: string;
 }
 
-const sleep = async (
-  milliseconds: number
-): Promise<void> => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 export const useAutoSyncCell = ({
   processType,
@@ -35,61 +34,65 @@ export const useAutoSyncCell = ({
   const [lastFocusMode, setLastFocusMode] = useState<FocusMode>("Focused");
   const [status, setStatus] = useState<SyncStatus>("OK");
   const [errorMessage, setErrorMessage] = useState<string|undefined>();
+  
+  // to detect initialValue (from database) is changed
+  const [lastInitialValue, setLastInitialValue] = useState<string>(initialValue);
 
   // update cell data when focus changed from Editing -> Focused
   useEffect(() => {
-    const asyncFunc = async () => {
       if (lastFocusMode === "Editing" && focusMode === "Focused") {
         if (lastValue != value) {
           setStatus("Updating");
-          await sleep(1000);
-          //await updateCondition();
-          try {
-            const response = await fetch(
-              `http://localhost/api/process/${processType}/${nodeId}`,
-              {
-                method: 'PUT',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ [columnName]: value })
-              }
+          fetch(
+            `http://localhost/api/process/${processType}/${nodeId}`,
+            {
+              method: 'PUT',
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                [columnName]: {
+                  "newValue": value,
+                  "oldValue": lastValue
+                } 
+              })
+            }
+          ).then(response => {
+            if (!response.ok) throw Error(
+              "Error occurred during fetch, " + response.statusText
             );
-            if (!response.ok) throw Error("Error occurred during fetch, " + response.statusText);
             setStatus("Updated");
             setLastValue(value);
             setErrorMessage(undefined);
-          } catch (e) {
+          }).catch(e => {
             setStatus("Error");
             if (e instanceof Error) {
               setErrorMessage(e.toString());
             } else {
               setErrorMessage("unknown error during fetch...");
             }
-          }
+          });
         }
       }
       setLastFocusMode(focusMode);
-    };
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    asyncFunc();
   }, [focusMode]);
 
   // change status Updated -> OK after 10 seconds
   useEffect(() => {
-    const asyncFunc = async () => {
-      if (status === "Updated") {
-        await sleep(10000);
-        setStatus("OK");
-      }
-    };
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    asyncFunc();
-  }, [status]);
+    if (status === "Updated") {
+      sleep(10000).then(() =>
+        setStatus("OK")
+      ).catch(e => console.log(e));
+    }
+  });
 
   // update initial value when background update
   useEffect(() => {
-    setValue(initialValue);
-    setLastValue(initialValue);
-    setStatus("Updated");
+    if (initialValue != lastInitialValue) {
+      setValue(initialValue);
+      setLastValue(initialValue);
+      setStatus("Updated");
+
+      setLastInitialValue(initialValue);
+    }
   }, [initialValue]);
   
   return {

@@ -13,25 +13,26 @@ const MainView: React.FC = () => {
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string|undefined>();
 
-  const handleLogin = async () => { 
-    try {
-      const response = await fetch(
-        'http://localhost/api/login',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            "username": username,
-            "password": password
-          })
-        }
-      );
-      if (!response.ok) throw Error("ログインに失敗しました");
+  const handleLogin = () => { 
+    fetch(
+      'http://localhost/api/login',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          "username": username,
+          "password": password
+        })
+      }
+    ).then(response => {
+      if (!response.ok) throw Error("Failed to login: " + response.statusText);
       window.location.href = '..';
-    } catch (e) {
+    }).catch(e => {
       if (e instanceof Error) {
         setErrorMessage(e.toString());
+      } else {
+        setErrorMessage("unknown error during fetch...");
       }
-    }
+    });
   };
 
   return (
@@ -58,7 +59,7 @@ const MainView: React.FC = () => {
           <Button
             className="ms-auto"
             variant="outline-primary"
-            onClick={void handleLogin}
+            onClick={handleLogin}
           >
             <i className="bi bi-door-open"/>
             Login
