@@ -54,7 +54,8 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
  
   const { connections } = useArrows({
     node,
-    container: refTable.current
+    container: refTable.current,
+    orderInfoDict
   });
 
   return (

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 
 import { FocusMode } from './useTableCellFocus';
 
+import { sleep } from './commonTypes';
+
 export type SyncStatus = "OK" | "Updating" | "Updated" | "Error"
 
 export type UseAutoSyncCellArgs = {
@@ -19,9 +21,6 @@ export type UseAutoSyncCellHookResult = {
   errorMessage: string;
 }
 
-const sleep = async (
-  milliseconds: number
-): Promise<void> => new Promise(resolve => setTimeout(resolve, milliseconds));
 
 export const useAutoSyncCell = ({
   processType,

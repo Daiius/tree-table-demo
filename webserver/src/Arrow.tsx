@@ -16,6 +16,9 @@ const Arrow: React.FC<ArrowProps> = ({
 }) => {
   const dx = Math.abs(to.x - from.x);
   const dy = Math.abs(to.y - from.y);
+  const lineDict = to.y > from.y
+    ? { y1: 0, y2: dy}
+    : { y1: dy, y2: 0};
   return (
     <svg
       viewBox={`0 0 ${dx} ${dy}`}
@@ -23,14 +26,14 @@ const Arrow: React.FC<ArrowProps> = ({
       style={{
         position: "absolute",
         left: `${from.x}px`,
-        top: `${from.y}px`,
+        top: `${Math.min(from.y, to.y)}px`,
         width: `${dx}px`,
         height: `${dy}px`,
       }}
     >
       <line
-        x1={0} y1={0}
-        x2={dx} y2={dy}
+        x1={0} x2={dx}
+        {...lineDict}
         stroke="gray"
       /> 
     </svg>
