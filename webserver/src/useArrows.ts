@@ -60,11 +60,9 @@ export const useArrows = ({
   // intentionally delaying change of connections to make sure that
   // TreeTableView component is rendered first, and then arrows are rendered
   useEffect(() => {
-    sleep(10).then(() => {
       const newDict: ConnectionDict = {};
       recursiveAddConnections(node, newDict, container);
       setConnections(newDict);
-    }).catch(e => console.log(e));
 
     return () => {
       setConnections({});
