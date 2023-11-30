@@ -34,7 +34,7 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
 
   // order columns with prioritization
   const {
-		orderInfoDict,
+    orderInfoDict,
     getOrderInfo,
     toggleOrder,
     recursiveSortNode
@@ -73,23 +73,23 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
       <tbody>
         {groupedNodes.map((row, irow) =>
           <tr key={irow}>
-						{/* column in row might be undefined, but should not be skipped... */}
+          {/* column in row might be undefined, but should not be skipped... */}
             {[...Array(row.length).keys()].map((_, inodes) =>
-							row[inodes] 
+              row[inodes] 
               ? <td key={inodes}>
-									<TableView
-										nodes={row[inodes]}
-										focusPosition={focusPosition}
-										setFocus={setFocus}
-										focusMode={focusMode}
-										orderInfoList={getOrderInfo(
-											row[inodes][0].parent?.process_id,
-											row[inodes][0].process_type
-										)}
-										toggleOrder={toggleOrder}
-									/>
-								</td>
-							: <td></td>
+                  <TableView
+                    nodes={row[inodes]}
+                    focusPosition={focusPosition}
+                    setFocus={setFocus}
+                    focusMode={focusMode}
+                    orderInfoList={getOrderInfo(
+                      row[inodes][0].parent?.process_id,
+                      row[inodes][0].process_type
+                    )}
+                    toggleOrder={toggleOrder}
+                  />
+                </td>
+              : <td></td>
             )}
           </tr>
         )}
