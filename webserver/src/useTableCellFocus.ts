@@ -19,7 +19,7 @@ export type FocusInfo = FocusPosition & FocusMode;
 export type SetFocusArgs = TablePosition & CellPosition & {
   rowNodeIds: string[];
   columnNames: string[];
-  focusMode: FocusMode;
+  focusMode?: FocusMode;
 }
 
 export type MoveFocusArgs = {
@@ -36,9 +36,17 @@ export type UseTableCellFocusHookResult = {
 
 
 export const useTableCellFocus = (): UseTableCellFocusHookResult => {
+
   const [focusPosition, setFocusPosition] = useState<FocusPosition|undefined>();
+  
+  // store last focus position to turn on edit mode when a focused cell is clicked.
+  const [lastFocusPosition, setLastFocusPosition] = useState<FocusPosition|undefined>();
+
+  // store current node ids of the focused table to move cell focus by up & down keys
   const [rowNodeIds, setRowNodeIds] = useState<string[]>([]);
+  // store current column names of the focused table to move cell focus by left & right keys
   const [columnNames, setColumnNames] = useState<string[]>([]);
+
   const [focusMode, setFocusMode] = useState<FocusMode>("Focused");
   
   // table cell, HTML <td> element, is usually not focusable.
@@ -98,7 +106,7 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
             ...focusPosition,
             rowNodeIds,
             columnNames,
-            focusMode: "Editing"
+            focusMode: "Focused",
           });
           break;
       }
@@ -130,7 +138,7 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
             ...focusPosition,
             rowNodeIds,
             columnNames,
-            focusMode: "Focused"
+            focusMode: "Focused",
           });
           break;
       }
@@ -173,7 +181,24 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
     });
     setRowNodeIds([...rowNodeIds]);
     setColumnNames([...columnNames]);
-    setFocusMode(focusMode);
+
+
+    if (focusMode == null) {
+      const isFocusedCellClicked =
+          commonParentId === lastFocusPosition?.commonParentId
+       && commonProcessType === lastFocusPosition?.commonProcessType
+       && rowNodeId === lastFocusPosition?.rowNodeId
+       && columnName === lastFocusPosition?.columnName;
+      if (isFocusedCellClicked) {
+        setFocusMode("Editing");
+      } else {
+        setFocusMode("Focused");
+      }
+    } else {
+      setFocusMode(focusMode);
+    }
+
+    setLastFocusPosition(focusPosition);
   };
 
   const moveFocus = ({ drow, dcolumn}: MoveFocusArgs) => {
