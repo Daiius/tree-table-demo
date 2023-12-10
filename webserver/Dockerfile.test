@@ -1,0 +1,14 @@
+
+FROM node:18
+
+WORKDIR /test
+
+COPY package.json package-lock.json /test
+
+RUN npm install
+
+COPY src/ /test/src/
+COPY tsconfig.json webpack.config.js jest.config.js /test
+
+CMD npx jest
+
