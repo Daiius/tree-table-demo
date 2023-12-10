@@ -39,9 +39,6 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
 
   const [focusPosition, setFocusPosition] = useState<FocusPosition|undefined>();
   
-  // store last focus position to turn on edit mode when a focused cell is clicked.
-  const [lastFocusPosition, setLastFocusPosition] = useState<FocusPosition|undefined>();
-
   // store current node ids of the focused table to move cell focus by up & down keys
   const [rowNodeIds, setRowNodeIds] = useState<string[]>([]);
   // store current column names of the focused table to move cell focus by left & right keys
@@ -106,7 +103,7 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
             ...focusPosition,
             rowNodeIds,
             columnNames,
-            focusMode: "Focused",
+            focusMode: "Editing",
           });
           break;
       }
@@ -185,10 +182,10 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
 
     if (focusMode == null) {
       const isFocusedCellClicked =
-          commonParentId === lastFocusPosition?.commonParentId
-       && commonProcessType === lastFocusPosition?.commonProcessType
-       && rowNodeId === lastFocusPosition?.rowNodeId
-       && columnName === lastFocusPosition?.columnName;
+          commonParentId === focusPosition?.commonParentId
+       && commonProcessType === focusPosition?.commonProcessType
+       && rowNodeId === focusPosition?.rowNodeId
+       && columnName === focusPosition?.columnName;
       if (isFocusedCellClicked) {
         setFocusMode("Editing");
       } else {
@@ -197,8 +194,6 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
     } else {
       setFocusMode(focusMode);
     }
-
-    setLastFocusPosition(focusPosition);
   };
 
   const moveFocus = ({ drow, dcolumn}: MoveFocusArgs) => {
