@@ -49,15 +49,6 @@ const TableView: React.FC<TableViewProps> = ({
         && (columnName === focusPosition?.columnName);
   };
 
-  const isSameAsLastFocus = (node: ProcessTreeNode, columnName: string): boolean => {
-    return (
-         (focusPosition?.commonParentId ?? "undefined") === (node.parent?.process_id ?? "undefined")
-      && focusPosition?.commonProcessType === node.process_type
-      && focusPosition?.rowNodeId === node.process_id
-      && focusPosition?.columnName === columnName
-    );
-  };
-
   return (
     <Card>
       <Card.Header>{nodes[0].process_type} x {nodes.length}</Card.Header>
@@ -115,7 +106,6 @@ const TableView: React.FC<TableViewProps> = ({
                       columnName: name,
                       rowNodeIds: nodes.map(node => node.process_id),
                       columnNames: conditionNames,
-                      focusMode: isSameAsLastFocus(node, name) ? "Editing" : "Focused"
                     })}
                   />
                 )}
