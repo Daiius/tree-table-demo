@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { ProcessTreeNode, sleep } from './commonTypes';
+import { ProcessTreeNode } from './commonTypes';
 import { ArrowProps, Point } from './Arrow';
-import { OrderInfoDict } from './usePrioritizedOrders';
 
 export type UseArrowsArgs = {
   node: ProcessTreeNode;
   container: HTMLTableElement|null;
-  orderInfoDict: OrderInfoDict;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dependencies: any[];
 }
 
 export type ConnectionDict = {
@@ -52,7 +52,7 @@ const recursiveAddConnections = (
 export const useArrows = ({
   node,
   container,
-  orderInfoDict
+  dependencies
 }: UseArrowsArgs): UseArrowResult => {
 
   const [connections, setConnections] = useState<ConnectionDict>({});
@@ -67,7 +67,9 @@ export const useArrows = ({
     return () => {
       setConnections({});
     };
-  }, [node, container, orderInfoDict]);
+  },
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  [node, container, ...dependencies]);
   
   return {
     connections

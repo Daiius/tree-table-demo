@@ -50,12 +50,12 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
     array: groupedNodes
   });
 
-  if (refTable == null) return <div>Rendering...</div>;
+  //if (refTable == null) return <div>Rendering...</div>;
  
   const { connections } = useArrows({
     node,
     container: refTable.current,
-    orderInfoDict
+    dependencies: [orderInfoDict]
   });
 
   return (
