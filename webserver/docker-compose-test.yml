@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  database:
+    build:
+      context: ../database
+      dockerfile: Dockerfile.test
+    container_name: tree-table-demo-database-test-webserver
+    healthcheck:
+      test: "mysql -u root -ptree-table-demo-database-mysql-root-password tree_table_demo -e 'select 1;'"
+      interval: 5s
+      timeout: 20s
+      retries: 3
+      start_period: 5s
+  webapi:
+    build:
+      context: ../webapi
+      dockerfile: Dockerfile.develop_test
+    container_name: tree-table-demo-webapi-test-webserver
+    stop_signal: SIGKILL
+    healthcheck:
+      test: "curl -f -X POST -H 'Content-Type: application/json' -d '{\"username\": \"test\", \"password\": \"test\" }' http://localhost:8000/api/login"
+      interval: 5s
+      timeout: 20s
+      retries: 3
+      start_period: 5s
+  webserver-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: tree-table-demo-webserver-test
+    depends_on:
+      webapi:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+
+

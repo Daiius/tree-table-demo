@@ -68,22 +68,26 @@ export const useTableCellFocus = (): UseTableCellFocusHookResult => {
       switch (key) {
         case e.shiftKey && 'Enter':
         case 'ArrowUp':
+          e.preventDefault();
           moveFocus({ drow: -1, dcolumn:  0 });
           break;
         case !e.shiftKey && 'Enter':
         case 'ArrowDown':
+          e.preventDefault();
           moveFocus({ drow:  1, dcolumn:  0 });
           break;
         case !e.shiftKey && 'Tab':
           e.preventDefault();
           // eslint-disable-next-line no-fallthrough
         case 'ArrowRight':
+          e.preventDefault();
           moveFocus({ drow:  0, dcolumn:  1 });
           break;
         case e.shiftKey && 'Tab':
           e.preventDefault();
           // eslint-disable-next-line no-fallthrough
         case 'ArrowLeft':
+          e.preventDefault();
           moveFocus({ drow:  0, dcolumn: -1 });
           break;
         case 'Escape':

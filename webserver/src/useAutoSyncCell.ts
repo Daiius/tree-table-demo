@@ -40,39 +40,39 @@ export const useAutoSyncCell = ({
 
   // update cell data when focus changed from Editing -> Focused
   useEffect(() => {
-      if (lastFocusMode === "Editing" && focusMode === "Focused") {
-        if (lastValue != value) {
-          setStatus("Updating");
-          fetch(
-            `http://localhost/api/process/${processType}/${nodeId}`,
-            {
-              method: 'PUT',
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                [columnName]: {
-                  "newValue": value,
-                  "oldValue": lastValue
-                } 
-              })
-            }
-          ).then(response => {
-            if (!response.ok) throw Error(
-              "Error occurred during fetch, " + response.statusText
-            );
-            setStatus("Updated");
-            setLastValue(value);
-            setErrorMessage(undefined);
-          }).catch(e => {
-            setStatus("Error");
-            if (e instanceof Error) {
-              setErrorMessage(e.toString());
-            } else {
-              setErrorMessage("unknown error during fetch...");
-            }
-          });
-        }
+    if (lastFocusMode === "Editing" && focusMode === "Focused") {
+      if (lastValue != value) {
+        setStatus("Updating");
+        fetch(
+          `http://localhost/api/process/${processType}/${nodeId}`,
+          {
+            method: 'PUT',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              [columnName]: {
+                "newValue": value,
+                "oldValue": lastValue
+              } 
+            })
+          }
+        ).then(response => {
+          if (!response.ok) throw Error(
+            "Error occurred during fetch, " + response.statusText
+          );
+          setStatus("Updated");
+          setLastValue(value);
+          setErrorMessage(undefined);
+        }).catch(e => {
+          setStatus("Error");
+          if (e instanceof Error) {
+            setErrorMessage(e.toString());
+          } else {
+            setErrorMessage("unknown error during fetch...");
+          }
+        });
       }
-      setLastFocusMode(focusMode);
+    }
+    setLastFocusMode(focusMode);
   }, [focusMode]);
 
   // change status Updated -> OK after 10 seconds

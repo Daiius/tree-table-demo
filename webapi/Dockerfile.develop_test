@@ -1,0 +1,11 @@
+FROM python:3.11-bullseye
+
+WORKDIR /develop
+
+RUN pip install flask flask-cors flask-login pymysql cryptography dataclasses_json uwsgi
+
+COPY *.py uwsgi.ini /develop/
+
+#CMD uwsgi uwsgi.ini
+CMD python3 webapi_server.py
+

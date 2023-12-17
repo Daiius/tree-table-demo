@@ -59,46 +59,46 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
   });
 
   return (
-    <div
-      style={{overflowX: "auto"}}
-    >
-    <div
-      ref={refTable}
-      style={{position: "relative"}}
-    >
-    <Table
-      id="tree-table-view-table"
-      className="tree-table-view-table"
-    >
-      <tbody>
-        {groupedNodes.map((row, irow) =>
-          <tr key={irow}>
-          {/* column in row might be undefined, but should not be skipped... */}
-            {[...Array(row.length).keys()].map((_, inodes) =>
-              row[inodes] 
-              ? <td key={inodes}>
-                  <TableView
-                    nodes={row[inodes]}
-                    focusPosition={focusPosition}
-                    setFocus={setFocus}
-                    focusMode={focusMode}
-                    orderInfoList={getOrderInfo(
-                      row[inodes][0].parent?.process_id,
-                      row[inodes][0].process_type
-                    )}
-                    toggleOrder={toggleOrder}
-                  />
-                </td>
-              : <td></td>
+    <div style={{overflowX: "auto"}}>
+      <div
+        ref={refTable}
+        style={{position: "relative"}}
+      >
+        <Table
+          id="tree-table-view-table"
+          className="tree-table-view-table"
+        >
+          <tbody>
+            {groupedNodes.map((row, irow) =>
+              <tr key={irow}>
+              {/* column in row might be undefined, but should not be skipped... */}
+                {[...Array(row.length).keys()].map((_, inodes) =>
+                  row[inodes] 
+                  ? <td
+                      key={`${row[inodes][0].parent?.process_id}-${row[inodes][0].process_type}`}
+                    >
+                      <TableView
+                        nodes={row[inodes]}
+                        focusPosition={focusPosition}
+                        setFocus={setFocus}
+                        focusMode={focusMode}
+                        orderInfoList={getOrderInfo(
+                          row[inodes][0].parent?.process_id,
+                          row[inodes][0].process_type
+                        )}
+                        toggleOrder={toggleOrder}
+                      />
+                    </td>
+                  : <td></td>
+                )}
+              </tr>
             )}
-          </tr>
+          </tbody>
+        </Table>
+        {Object.entries(connections).map(([key, arrowProps]) =>
+          <Arrow key={key} {...arrowProps} />
         )}
-      </tbody>
-    </Table>
-    {Object.entries(connections).map(([key, arrowProps]) =>
-      <Arrow key={key} {...arrowProps} />
-    )}
-    </div>
+      </div>
     </div>
   );
 };
