@@ -32,7 +32,7 @@ const SmartCell: React.FC<SmartCellProps> = ({
     value,
     setValue,
     status,
-    //errorMessage
+    errorMessage
   } = useAutoSyncCell({
     processType,
     nodeId,
@@ -60,7 +60,10 @@ const SmartCell: React.FC<SmartCellProps> = ({
             />
           : <div>{value}</div>
         }
-        <SyncStatusMark syncStatus={status} />
+        <SyncStatusMark
+          syncStatus={status}
+          errorMessage={errorMessage}
+        />
       </Stack>
     </td>
   );

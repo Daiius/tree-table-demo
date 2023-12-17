@@ -14,3 +14,11 @@ docker container rm tree-table-demo-interface-test
 
 exit $result
 
+#set -e
+#docker compose -f docker-compose-test.yml up --build --exit-code-from=webserver-test
+#result=$?
+#
+#docker cp webserver-test:/test/junit.xml .
+#
+#docker compose -f docker-compose-test.yml down
+

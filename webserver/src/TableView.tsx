@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 
 import Card from 'react-bootstrap/Card';
 import Table from 'react-bootstrap/Table';
 import Stack from 'react-bootstrap/Stack';
+import Dropdown from 'react-bootstrap/Dropdown';
 
-import SmartCell from './SmartCell';
+import SmartRow from './SmartRow';
 import PrioritizedOrderMark from './PrioritizedOrderMark';
+
 
 import { ProcessTreeNode } from './commonTypes';
 import {
@@ -37,22 +39,45 @@ const TableView: React.FC<TableViewProps> = ({
   orderInfoList,
   toggleOrder
 }) => {
+  
 
-  const conditionNames =
-    Object.keys(nodes[0].conditions)
-    .filter(name => name !== "process_id");
+  const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
+  
+  type ContextMenuPosition = {
+    left: number;
+    top: number;
+  }
+  const [contextMenuPosition, setContextMenuPosition] = useState<ContextMenuPosition>({
+    left: 0, top: 0
+  });
+  const [contextMenuRowId, setContextMenuRowId] = useState<string>("");
 
-  const checkIsCellFocused = (node: ProcessTreeNode, columnName: string) => {
-    return ((node.parent?.process_id ?? "undefined") === focusPosition?.commonParentId)
-        && (node.process_type === focusPosition?.commonProcessType)
-        && (node.process_id === focusPosition?.rowNodeId)
-        && (columnName === focusPosition?.columnName);
+  const refContainer = useRef<HTMLDivElement|null>(null);
+
+  const columnNames = [
+    ...Object.keys(nodes[0].conditions),
+    ...[...new Set(
+      nodes.flatMap(node => Object.keys(node.evaluations))
+    )],
+  ].filter(name => name !== "process_id");
+
+  const handleContextMenu = (clientX: number, clientY: number, rowNodeId: string) => {
+    
+    if (refContainer.current == null) return;
+
+    setShowContextMenu(true);
+    const containerBoundingRect = refContainer.current.getBoundingClientRect();
+    setContextMenuPosition({
+      left: clientX - containerBoundingRect.left,
+      top: clientY - containerBoundingRect.top
+    });
+    setContextMenuRowId(rowNodeId);
   };
 
   return (
     <Card>
       <Card.Header>{nodes[0].process_type} x {nodes.length}</Card.Header>
-      <Card.Body>
+      <Card.Body ref={refContainer}>
         <Table
           className="tableview-main-table"
           bordered
@@ -64,7 +89,7 @@ const TableView: React.FC<TableViewProps> = ({
             id={`group-${nodes[0].parent?.process_id}`}
           >
             <tr>
-              {conditionNames.map(name =>
+              {columnNames.map(name =>
                 <th
                   key={name}
                   onClick={()=>toggleOrder({
@@ -86,33 +111,38 @@ const TableView: React.FC<TableViewProps> = ({
           </thead>
           <tbody>
             {nodes.map(node =>
-              <tr
+              <SmartRow
                 key={node.process_id}
-                id={`node-${node.process_id}`}
-              >
-                {conditionNames.map(name =>
-                  <SmartCell
-                    key={name}
-                    processType={node.process_type}
-                    nodeId={node.process_id}
-                    columnName={name}
-                    initialValue={node.conditions[name]}
-                    focused={checkIsCellFocused(node, name)}
-                    focusMode={focusMode}
-                    onClick={()=>setFocus({
-                      commonParentId: nodes[0].parent?.process_id ?? "undefined",
-                      commonProcessType: nodes[0].process_type,
-                      rowNodeId: node.process_id,
-                      columnName: name,
-                      rowNodeIds: nodes.map(node => node.process_id),
-                      columnNames: conditionNames,
-                    })}
-                  />
-                )}
-              </tr>
+                node={node}
+                focusPosition={focusPosition}
+                focusMode={focusMode}
+                columnNames={columnNames}
+                onClick={columnName => setFocus({
+                  columnName,
+                  columnNames,
+                  commonParentId: node.parent?.process_id ?? "undefined",
+                  commonProcessType: node.process_type,
+                  rowNodeId: node.process_id,
+                  rowNodeIds: nodes.map(node => node.process_id),
+                })}
+                onContextMenu={handleContextMenu}
+              />
             )}
           </tbody>
         </Table>
+
+        <Dropdown.Menu
+          show={showContextMenu}
+          style={{
+            position: "absolute",
+            left: `${contextMenuPosition.left}px`,
+            top: `${contextMenuPosition.top}px`,
+          }}
+        >
+          <Dropdown.Item onClick={()=>setShowContextMenu(false)}>
+            Hello, this is a custom context menu!
+          </Dropdown.Item>
+        </Dropdown.Menu>
       </Card.Body>
     </Card>
   );
