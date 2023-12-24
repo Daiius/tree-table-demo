@@ -28,13 +28,6 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
  
   const refTable = useRef<HTMLElement|null>(null);
   
-  // handle table cell focus & edit position
-  const {
-    focusPosition,
-    setFocus,
-    focusMode
-  } = useTableCellFocus();
-
   // order columns with prioritization
   const {
     orderInfoDict,
@@ -84,9 +77,6 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
                     >
                       <TableView
                         nodes={row[inodes]}
-                        focusPosition={focusPosition}
-                        setFocus={setFocus}
-                        focusMode={focusMode}
                         orderInfoList={getOrderInfo(
                           row[inodes][0].parent?.process_id,
                           row[inodes][0].process_type

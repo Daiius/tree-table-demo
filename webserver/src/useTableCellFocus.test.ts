@@ -1,5 +1,6 @@
 import {
-  useTableCellFocus
+  useTableCellFocus,
+  useTableCellFocusDispatcher,
 } from './useTableCellFocus';
 
 import { renderHook, act } from '@testing-library/react';
@@ -20,6 +21,7 @@ describe('useTableCellFocus Tests', () => {
 
   test('setFocus to same cell make focusMode "Editing"', () => {
     const { result } = renderHook(() => useTableCellFocus());
+    const { result: resultDispatcher } = renderHook(() => useTableCellFocusDispatcher());
     const args = {
       commonParentId: dummyCommonParentId,
       commonProcessType: dummyCommonProcessType,
@@ -30,8 +32,8 @@ describe('useTableCellFocus Tests', () => {
     };
     // NOTE
     // two ast() calls are needed to emulate two setFocus() calls
-    act(() => result.current.setFocus(args));
-    act(() => result.current.setFocus(args));
+    act(() => resultDispatcher.current.setFocus(args));
+    act(() => resultDispatcher.current.setFocus(args));
     expect(result.current.focusPosition?.commonParentId).toBe(dummyCommonParentId);
     expect(result.current.focusPosition?.commonProcessType).toBe(dummyCommonProcessType);
     expect(result.current.focusMode).toBe("Editing");
