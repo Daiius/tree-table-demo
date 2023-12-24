@@ -9,6 +9,7 @@ import {
   SetFocusArgs,
 } from './useTableCellFocus';
 
+import { useContextMenuDispatcher } from './useContextMenu';
 
 export type SmartRowProps = {
   node: ProcessTreeNode;
@@ -16,7 +17,6 @@ export type SmartRowProps = {
   focusMode: FocusMode;
   columnNames: string[];
   onClick: (columnName: string) => void;
-  onContextMenu: (clientX: number, clientY: number, rowNodeId: string) => void;
 };
 
 const SmartRow: React.FC<SmartRowProps> = ({
@@ -25,7 +25,6 @@ const SmartRow: React.FC<SmartRowProps> = ({
   focusMode,
   columnNames,
   onClick,
-  onContextMenu,
 }) => {
   
   
@@ -35,13 +34,18 @@ const SmartRow: React.FC<SmartRowProps> = ({
         && (node.process_id === focusPosition?.rowNodeId)
         && (columnName === focusPosition?.columnName);
   };
+
+  const { onContextMenu } = useContextMenuDispatcher();
   
   return (
     <tr
       id={`node-${node.process_id}`}
       onContextMenu={e => {
         e.preventDefault()
-        onContextMenu(e.clientX, e.clientY, node.process_id);
+        onContextMenu({
+          clientX: e.clientX, clientY: e.clientY,
+          rowId: node.process_id
+        });
       }}
     >
       {columnNames.map(name =>

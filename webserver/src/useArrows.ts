@@ -4,7 +4,7 @@ import { ArrowProps, Point } from './Arrow';
 
 export type UseArrowsArgs = {
   node: ProcessTreeNode;
-  container: HTMLTableElement|null;
+  container: HTMLElement|null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dependencies: any[];
 }
@@ -20,7 +20,7 @@ export type UseArrowResult = {
 const recursiveAddConnections = (
   node: ProcessTreeNode,
   dict: ConnectionDict,
-  container: HTMLTableElement|null
+  container: HTMLElement|null
 ) => {
   for (const child of node.children) {
     const fromId = `node-${node.process_id}`;

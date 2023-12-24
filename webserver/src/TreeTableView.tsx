@@ -13,6 +13,9 @@ import { useArrows } from './useArrows';
 import { useTableCellFocus } from './useTableCellFocus';
 import { usePrioritizedOrders } from './usePrioritizedOrders';
 
+import ContextMenu from './ContextMenu';
+import { useContextMenuDispatcher } from './useContextMenu';
+
 import './TreeTableView.scss';
 
 export type TreeTableViewProps = {
@@ -23,7 +26,7 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
   node
 }) => {
  
-  const refTable = useRef<HTMLTableElement|null>(null);
+  const refTable = useRef<HTMLElement|null>(null);
   
   // handle table cell focus & edit position
   const {
@@ -49,8 +52,6 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
     icolumn: 0,
     array: groupedNodes
   });
-
-  //if (refTable == null) return <div>Rendering...</div>;
  
   const { connections } = useArrows({
     node,
@@ -58,10 +59,14 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
     dependencies: [orderInfoDict]
   });
 
+  
+  const { setContainer } = useContextMenuDispatcher();
+  if (refTable.current != null) setContainer(refTable.current);
+
   return (
     <div style={{overflowX: "auto"}}>
       <div
-        ref={refTable}
+        ref={refTable as React.MutableRefObject<HTMLDivElement>}
         style={{position: "relative"}}
       >
         <Table
@@ -98,6 +103,7 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
         {Object.entries(connections).map(([key, arrowProps]) =>
           <Arrow key={key} {...arrowProps} />
         )}
+        <ContextMenu />
       </div>
     </div>
   );
