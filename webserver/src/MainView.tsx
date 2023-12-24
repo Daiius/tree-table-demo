@@ -10,6 +10,8 @@ import TreeTableView from './TreeTableView';
 
 import { useProcessData } from 'useProcessData';
 
+import { ContextMenuProvider } from './useContextMenu';
+
 const MainView = () => {
   
   const { node } = useProcessData();
@@ -38,9 +40,11 @@ const MainView = () => {
 						</Alert>
 					}
 				>
-					<TreeTableView
-						node={node}
-					/>
+          <ContextMenuProvider>
+            <TreeTableView
+              node={node}
+            />
+          </ContextMenuProvider>
 				</ErrorBoundary>
       </Tab>
     </Tabs>

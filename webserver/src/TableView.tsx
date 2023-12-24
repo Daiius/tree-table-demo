@@ -41,19 +41,6 @@ const TableView: React.FC<TableViewProps> = ({
 }) => {
   
 
-  const [showContextMenu, setShowContextMenu] = useState<boolean>(false);
-  
-  type ContextMenuPosition = {
-    left: number;
-    top: number;
-  }
-  const [contextMenuPosition, setContextMenuPosition] = useState<ContextMenuPosition>({
-    left: 0, top: 0
-  });
-  const [contextMenuRowId, setContextMenuRowId] = useState<string>("");
-
-  const refContainer = useRef<HTMLDivElement|null>(null);
-
   const columnNames = [
     ...Object.keys(nodes[0].conditions),
     ...[...new Set(
@@ -61,23 +48,10 @@ const TableView: React.FC<TableViewProps> = ({
     )],
   ].filter(name => name !== "process_id");
 
-  const handleContextMenu = (clientX: number, clientY: number, rowNodeId: string) => {
-    
-    if (refContainer.current == null) return;
-
-    setShowContextMenu(true);
-    const containerBoundingRect = refContainer.current.getBoundingClientRect();
-    setContextMenuPosition({
-      left: clientX - containerBoundingRect.left,
-      top: clientY - containerBoundingRect.top
-    });
-    setContextMenuRowId(rowNodeId);
-  };
-
   return (
     <Card>
       <Card.Header>{nodes[0].process_type} x {nodes.length}</Card.Header>
-      <Card.Body ref={refContainer}>
+      <Card.Body>
         <Table
           className="tableview-main-table"
           bordered
@@ -125,24 +99,10 @@ const TableView: React.FC<TableViewProps> = ({
                   rowNodeId: node.process_id,
                   rowNodeIds: nodes.map(node => node.process_id),
                 })}
-                onContextMenu={handleContextMenu}
               />
             )}
           </tbody>
         </Table>
-
-        <Dropdown.Menu
-          show={showContextMenu}
-          style={{
-            position: "absolute",
-            left: `${contextMenuPosition.left}px`,
-            top: `${contextMenuPosition.top}px`,
-          }}
-        >
-          <Dropdown.Item onClick={()=>setShowContextMenu(false)}>
-            Hello, this is a custom context menu!
-          </Dropdown.Item>
-        </Dropdown.Menu>
       </Card.Body>
     </Card>
   );
