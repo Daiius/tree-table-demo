@@ -70,6 +70,7 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
             {groupedNodes.map((row, irow) =>
               <tr key={irow}>
               {/* column in row might be undefined, but should not be skipped... */}
+              {/* map() skips undefined elements, so ugly code is used here... */}
                 {[...Array(row.length).keys()].map((_, inodes) =>
                   row[inodes] 
                   ? <td
