@@ -269,7 +269,7 @@ def build_json(
 def update_process(
   process_type: str,
   process_id: str,
-  data: dict[str, str],
+  data: dict[str, dict[str, str]],
   connection: pymysql.connections.Connection
 ):
   # get target table name
