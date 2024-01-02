@@ -11,5 +11,5 @@ RUN pip install flask flask-cors flask-login pymysql dataclasses_json
 
 COPY *.py /check
 
-CMD mypy webapi_server.py
+CMD mypy webapi_server.py unittest_webapi_server.py
 
