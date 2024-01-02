@@ -10,24 +10,22 @@ import {
 } from './useTableCellFocus';
 
 import { useContextMenuDispatcher } from './useContextMenu';
+import { useTableCellFocus } from './useTableCellFocus';
 
 export type SmartRowProps = {
   node: ProcessTreeNode;
-  focusPosition: FocusPosition|undefined;
-  focusMode: FocusMode;
   columnNames: string[];
   onClick: (columnName: string) => void;
 };
 
 const SmartRow: React.FC<SmartRowProps> = ({
   node,
-  focusPosition,
-  focusMode,
   columnNames,
   onClick,
 }) => {
   
-  
+  const { focusPosition, focusMode } = useTableCellFocus();
+
   const checkIsCellFocused = (node: ProcessTreeNode, columnName: string) => {
     return ((node.parent?.process_id ?? "undefined") === focusPosition?.commonParentId)
         && (node.process_type === focusPosition?.commonProcessType)

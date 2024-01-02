@@ -11,6 +11,7 @@ import TreeTableView from './TreeTableView';
 import { useProcessData } from 'useProcessData';
 
 import { ContextMenuProvider } from './useContextMenu';
+import { TableCellFocusProvider } from './useTableCellFocus';
 
 const MainView = () => {
   
@@ -41,9 +42,9 @@ const MainView = () => {
 					}
 				>
           <ContextMenuProvider>
-            <TreeTableView
-              node={node}
-            />
+            <TableCellFocusProvider>
+              <TreeTableView node={node} />
+            </TableCellFocusProvider>
           </ContextMenuProvider>
 				</ErrorBoundary>
       </Tab>

@@ -28,13 +28,6 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
  
   const refTable = useRef<HTMLElement|null>(null);
   
-  // handle table cell focus & edit position
-  const {
-    focusPosition,
-    setFocus,
-    focusMode
-  } = useTableCellFocus();
-
   // order columns with prioritization
   const {
     orderInfoDict,
@@ -77,6 +70,7 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
             {groupedNodes.map((row, irow) =>
               <tr key={irow}>
               {/* column in row might be undefined, but should not be skipped... */}
+              {/* map() skips undefined elements, so ugly code is used here... */}
                 {[...Array(row.length).keys()].map((_, inodes) =>
                   row[inodes] 
                   ? <td
@@ -84,9 +78,6 @@ const TreeTableView: React.FC<TreeTableViewProps> = ({
                     >
                       <TableView
                         nodes={row[inodes]}
-                        focusPosition={focusPosition}
-                        setFocus={setFocus}
-                        focusMode={focusMode}
                         orderInfoList={getOrderInfo(
                           row[inodes][0].parent?.process_id,
                           row[inodes][0].process_type

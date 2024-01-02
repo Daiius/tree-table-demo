@@ -1,17 +1,23 @@
 from typing import reveal_type
 import json
 
+import flask
 from flask import (
   Flask,
   session,
   request
 )
 
-from flask_cors import CORS
-
 import pymysql
 
 import webapi_server_helper
+from webapi_app import app
+from webapi_utilities import (
+  connect,
+  make_json,
+)
+
+
 from webapi_server_helper import (
   build_json,
   ProcessTreeNode
@@ -25,43 +31,12 @@ from flask_login import ( # type: ignore
   login_user
 )
 
-app = Flask(__name__)
-cors = CORS(
-  app,
-  resources = {
-    r"/*": {
-      "origins": [
-        "http://localhost",
-        "http://tree-table-demo-web-server"
-      ]
-    }
-  }
-)
-app.secret_key = b'this key should be really secret in the production code!!!'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-def connect(is_testing: bool) -> pymysql.connections.Connection:
-    #print("app.testing: ", is_testing)
-    if is_testing:
-        host = "tree-table-demo-webapi-test-database"
-    else:
-        host = "tree-table-demo-database"
 
-    return pymysql.connect(
-        host = host,
-        user = "root",
-        password = "tree-table-demo-database-mysql-root-password",
-        database = "tree_table_demo",
-        cursorclass = pymysql.cursors.DictCursor,
-        read_timeout = 5,
-        write_timeout = 5
-    )
-    
-
-def make_json(data) -> bytes:
-    return json.dumps(data).encode('utf-8')
+import webapi_masters
 
 class User(UserMixin):
     def __init__(self, user_id: str):
@@ -73,16 +48,16 @@ def load_user(user_id: str) -> User:
  
 @app.get("/api/login")
 @login_required
-def get_login() -> tuple[bytes, int]:
+def get_login() -> tuple[flask.Response, int]:
     return make_json("you are an active user!"), 200
 
 @app.post("/api/login")
-def post_login() -> tuple[bytes, int]:
+def post_login() -> tuple[flask.Response, int]:
     data = json.loads(request.get_data())
     username = data["username"]
     password = data["password"]
 
-    print(data, flush=True)
+    #print(data, flush=True)
 
     # TODO test implementation
     if username == password:
@@ -96,7 +71,7 @@ def post_login() -> tuple[bytes, int]:
 
 
 @app.get("/api/processes")
-def get_process_list() -> tuple[bytes, int]:
+def get_process_list() -> tuple[flask.Response, int]:
     connection = connect(app.testing)
     with connection.cursor() as cursor:
         cursor.execute("select * from process_list")
@@ -104,7 +79,7 @@ def get_process_list() -> tuple[bytes, int]:
     return make_json(result), 200
 
 @app.get("/api/processes/roots")
-def get_process_roots() -> tuple[bytes, int]:
+def get_process_roots() -> tuple[flask.Response, int]:
     connection = connect(app.testing)
     with connection.cursor() as cursor:
         cursor.execute("select * from process_list where prev_id is NULL")
@@ -112,7 +87,7 @@ def get_process_roots() -> tuple[bytes, int]:
     return make_json(result), 200
 
 @app.get("/api/processes/trees/<string:ids>")
-def get_process_tree(ids: str) -> tuple[bytes, int]:
+def get_process_tree(ids: str) -> tuple[flask.Response, int]:
     """
     ids: semicolon separated process ids
     """
@@ -122,7 +97,7 @@ def get_process_tree(ids: str) -> tuple[bytes, int]:
     return make_json(result), 200
 
 @app.put("/api/process/<string:process_type>/<string:process_id>")
-def update_process(process_type: str, process_id: str) -> tuple[bytes, int]:
+def update_process(process_type: str, process_id: str) -> tuple[flask.Response, int]:
   """
     body: {
       "conditionName1": {

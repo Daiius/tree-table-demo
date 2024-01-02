@@ -20,22 +20,18 @@ import {
   ToggleOrderArgs
 } from './usePrioritizedOrders';
 
+import { useTableCellFocusDispatcher } from './useTableCellFocus';
+
 import './TableView.scss';
 
 export type TableViewProps = {
   nodes: ProcessTreeNode[];
-  focusPosition: FocusPosition|undefined;
-  focusMode: FocusMode;
-  setFocus: (args: SetFocusArgs) => void;
   orderInfoList?: OrderInfo[];
   toggleOrder: (args: ToggleOrderArgs) => void;
 }
 
 const TableView: React.FC<TableViewProps> = ({
   nodes,
-  focusPosition,
-  focusMode,
-  setFocus,
   orderInfoList,
   toggleOrder
 }) => {
@@ -47,6 +43,8 @@ const TableView: React.FC<TableViewProps> = ({
       nodes.flatMap(node => Object.keys(node.evaluations))
     )],
   ].filter(name => name !== "process_id");
+
+  const { setFocus } = useTableCellFocusDispatcher();
 
   return (
     <Card>
@@ -88,8 +86,6 @@ const TableView: React.FC<TableViewProps> = ({
               <SmartRow
                 key={node.process_id}
                 node={node}
-                focusPosition={focusPosition}
-                focusMode={focusMode}
                 columnNames={columnNames}
                 onClick={columnName => setFocus({
                   columnName,
