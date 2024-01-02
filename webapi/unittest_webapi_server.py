@@ -19,21 +19,31 @@ class WebApiServerTest(unittest.TestCase):
             }
         )
 
-    def test_get_process_list(self):
-        response = self.client.get("/processes")
-        data = response.get_json()
+    def test_get_process_list(self) -> None:
+        response = self.client.get("/api/processes")
+        data = response.text
+        self.assertEqual(response.status_code, 200)
 
-    def test_get_root_processes(self):
-        response = self.client.get("/processes/roots")
-        data = response.get_json()
+    def test_get_root_processes(self) -> None:
+        response = self.client.get("/api/processes/roots")
+        data = response.text
+        self.assertEqual(response.status_code, 200)
 
-    def test_get_processes_trees(self):
-        response = self.client.get("/processes/trees/0")
-        data = response.get_json()
+    def test_get_processes_trees(self) -> None: 
+        response = self.client.get("/api/processes/trees/0")
+        data = response.text
+        self.assertEqual(response.status_code, 200)
 
-    def test_get_login(self):
+    def test_get_login(self) -> None:
         response = self.client.get("/api/login")
-        data = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        data = response.text
+
+    def test_get_master_info(self) -> None:
+      response = self.client.get("/api/master-info")
+      self.assertEqual(response.status_code, 200)
+      data = response.text
+      print(data, flush=True)
 
 if __name__ == '__main__':
     unittest.main()
