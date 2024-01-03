@@ -18,7 +18,7 @@ set -e
 docker compose -f docker-compose-test.yml up --build --exit-code-from=webserver-test
 result=$?
 
-docker cp webserver-test:/test/junit.xml .
+docker cp tree-table-demo-webserver-test:/test/junit.xml .
 
 docker compose -f docker-compose-test.yml down
 
