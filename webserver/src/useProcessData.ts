@@ -1,8 +1,15 @@
 import useSWR from 'swr';
 
-import { ProcessTreeNode, jsonToProcessTreeNode } from 'commonTypes';
+import {
+  ProcessTreeNode,
+  jsonToProcessTreeNode,
+} from 'commonTypes';
 
-const fetcher = (url: string) => fetch(url).then(response => response.json());
+import { getAPIUrl } from 'communications';
+
+import axios from 'axios';
+
+const fetcher = (url: string) => axios.get(getAPIUrl() + url).then(response => response.data);
 
 export type UseProcessDataResult = {
   node: ProcessTreeNode | undefined;
@@ -11,7 +18,7 @@ export type UseProcessDataResult = {
 
 export const useProcessData = () => {
   const { data, error } = useSWR<ProcessTreeNode[], Error>(
-    'http://localhost/api/processes/trees/0',
+    '/api/processes/trees/0',
     fetcher, {
       refreshInterval: 5_000
     }

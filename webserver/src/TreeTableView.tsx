@@ -10,7 +10,7 @@ import { recursiveGroupNodes } from './nodeGroupUtils';
 import Arrow, { ArrowProps, Point } from './Arrow';
 import { useArrows } from './useArrows';
 
-import { useTableCellFocus } from './useTableCellFocus';
+import { useTableCellFocus } from './useTableCellFocusContext';
 import { usePrioritizedOrders } from './usePrioritizedOrders';
 
 import ContextMenu from './ContextMenu';

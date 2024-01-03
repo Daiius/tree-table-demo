@@ -3,14 +3,9 @@ import React from 'react';
 import SmartCell from './SmartCell';
 
 import { ProcessTreeNode } from 'commonTypes';
-import {
-  FocusMode,
-  FocusPosition,
-  SetFocusArgs,
-} from './useTableCellFocus';
 
 import { useContextMenuDispatcher } from './useContextMenu';
-import { useTableCellFocus } from './useTableCellFocus';
+import { useTableCellFocus } from './useTableCellFocusContext';
 
 export type SmartRowProps = {
   node: ProcessTreeNode;

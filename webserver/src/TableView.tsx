@@ -20,7 +20,7 @@ import {
   ToggleOrderArgs
 } from './usePrioritizedOrders';
 
-import { useTableCellFocusDispatcher } from './useTableCellFocus';
+import { useTableCellFocusDispatcher } from './useTableCellFocusContext';
 
 import './TableView.scss';
 
@@ -37,6 +37,12 @@ const TableView: React.FC<TableViewProps> = ({
 }) => {
   
 
+  // TODO
+  // columns are from existing data,
+  // but they should be extended to input new data.
+  //
+  // { [commonParentIdAndCommonProcessType: string]: AdditionalColumName[] }
+  // 
   const columnNames = [
     ...Object.keys(nodes[0].conditions),
     ...[...new Set(

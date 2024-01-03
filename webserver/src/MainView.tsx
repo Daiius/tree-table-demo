@@ -11,7 +11,7 @@ import TreeTableView from './TreeTableView';
 import { useProcessData } from 'useProcessData';
 
 import { ContextMenuProvider } from './useContextMenu';
-import { TableCellFocusProvider } from './useTableCellFocus';
+import { TableCellFocusProvider } from './useTableCellFocusContext';
 
 const MainView = () => {
   

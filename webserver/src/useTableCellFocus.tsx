@@ -1,6 +1,4 @@
 import React, {
-  createContext,
-  useContext,
   useState,
   useEffect,
 } from 'react';
@@ -35,19 +33,11 @@ export type MoveFocusArgs = {
 export type UseTableCellFocus = {
   focusPosition: FocusPosition|undefined;
   focusMode: FocusMode;
-};
-const TableCellFocusContext =
-  createContext<UseTableCellFocus|undefined>(undefined);
-
-export type UseTableCellFocusDispatcher = {
   setFocus: (args: SetFocusArgs) => void;
   moveFocus: (args: MoveFocusArgs) => void;
 };
-const TableCellFocusDispatcherContext =
-  createContext<UseTableCellFocusDispatcher|undefined>(undefined);
 
-
-const useTableCellFocusCore = (): UseTableCellFocus & UseTableCellFocusDispatcher => {
+export const useTableCellFocus = (): UseTableCellFocus => {
 
   const [focusPosition, setFocusPosition] = useState<FocusPosition|undefined>();
   
@@ -281,34 +271,5 @@ const useTableCellFocusCore = (): UseTableCellFocus & UseTableCellFocusDispatche
     setFocus,
     moveFocus,
   };
-};
-
-export const useTableCellFocus = () => useContext(TableCellFocusContext)
-  ?? (() => { throw new Error("useTableCellFocus() is called outside of the context!"); })();
-
-export const useTableCellFocusDispatcher = () => useContext(TableCellFocusDispatcherContext)
-  ?? (() => { throw new Error("useTableCellFocusDispatcher() is called outside of the context");})();
-
-export const TableCellFocusProvider: React.FC<React.PropsWithChildren> = ({
-  children
-}) => {
-  const {
-    focusPosition,
-    focusMode,
-    setFocus,
-    moveFocus,
-  } = useTableCellFocusCore();
-
-  return (
-    <TableCellFocusContext.Provider
-      value={{ focusPosition, focusMode }}
-    >
-      <TableCellFocusDispatcherContext.Provider
-        value={{ setFocus, moveFocus }}
-      >
-        {children}
-      </TableCellFocusDispatcherContext.Provider>
-    </TableCellFocusContext.Provider>
-  );
 };
 
