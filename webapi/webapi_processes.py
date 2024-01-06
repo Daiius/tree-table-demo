@@ -176,7 +176,7 @@ class InsertOrUpdateProcessData(pydantic.BaseModel):
     populate_by_name=True,
   )
   conditions: dict[str, NewAndOldValuePair]
-  parent_id: str | None = pydantic.Field(alias="parentId")
+  parent_id: typing.Optional[str] = pydantic.Field(default=None, alias="parentId")
 
 @app.put("/api/process/<string:process_type>/<string:process_id>")
 def insert_or_update_process(
@@ -218,47 +218,48 @@ def insert_or_update_process(
     # insert process_list data if there's no process_list entry
     # and insert process conditions
     connection.begin()
+    # update target table
+    data.conditions["process_id"] = NewAndOldValuePair(
+      new_value = process_id, old_value = None
+    )
     with connection.cursor() as cursor:
       if process_list_data is None:
         cursor.execute(
           "INSERT process_list (process_id, process_type, prev_id) VALUE (%s, %s, %s)",
           [ process_id, process_type, data.parent_id ]
         )
+        sql_list_insert = f"({','.join([f'%({k}_new)s' for k in data.conditions.keys()])})"
+        cursor.execute(
+          f"""
+            INSERT
+              {table_name}
+              ({', '.join(data.conditions.keys())})
+            VALUES
+              {sql_list_insert}
+          """,
 
-      # update target table
-      data.conditions["process_id"] = NewAndOldValuePair(
-        new_value = process_id, old_value = None
-      )
-      sql_list_update_new = [f"{k} = %({k}_new)s" for k in data.conditions.keys()]
-      sql_list_update_old = [f"{k} = %({k}_old)s" for k in data.conditions.keys()]
-      sql_list_insert = f"({','.join([f'%({k}_new)s' for k in data.conditions.keys()])})"
-      #print(sql_list, flush=True)
-      sql_base = f"""
-          INSERT
+        )
+      else:
+        sql_list_update_new = [f"{k} = %({k}_new)s" for k in data.conditions.keys()]
+        sql_list_update_old = [f"{k} = %({k}_old)s" for k in data.conditions.keys()]
+        sql_base = f"""
+          UPDATE
             {table_name}
-            ({', '.join(data.conditions.keys())})
-          VALUES
-            {sql_list_insert}
-          ON DUPLICATE KEY UPDATE
-            {', '.join(sql_list_update_new)}
-      """
-      #    WHERE
-      #      process_id = %(process_id)s
-      #      AND
-      #      {' AND '.join(sql_list_update_old)}
-      print(sql_base, flush=True)
-      sql = cursor.mogrify(
-        sql_base,
-        { "process_id": process_id } | {
-          k + "_new" : v.new_value
-          for k, v in data.conditions.items()
-        } | {
-          k + "_old" : v.old_value
-          for k, v in data.conditions.items()
-        }
-      )
-      print(sql, flush=True)
-      cursor.execute(sql)
+          SET
+            {','.join(sql_list_update_new)}
+          WHERE
+            process_id = %(process_id_new)s
+        """
+        print(sql_base, flush=True)
+        sql = cursor.mogrify(
+          sql_base,
+          {
+            k + "_new" : v
+            for k, v in data.conditions.items()
+          }
+        )
+        print(sql, flush=True)
+        cursor.execute(sql)
     connection.commit()
   return make_json(data), 200
 

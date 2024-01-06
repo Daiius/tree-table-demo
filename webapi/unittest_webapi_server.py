@@ -47,7 +47,7 @@ class WebApiServerTest(unittest.TestCase):
       self.assertEqual(response.status_code, 200)
       print(response.text, flush=True)
 
-    def test_insert_process(self) -> None:
+    def test_100_insert_process(self) -> None:
       response = self.client.put(
         "/api/process/cutting/900",
         json = {
@@ -66,6 +66,17 @@ class WebApiServerTest(unittest.TestCase):
       self.assertEqual(data["900"]["conditions"]["tool"], "knife")
       self.assertEqual(data["900"]["conditions"]["operator"], "Charlie")
 
+    def test_101_update_process(self) -> None:
+      response = self.client.put(
+        "/api/process/cutting/900",
+        json = {
+          "conditions": {
+            "tool": { "new_value": "knife", "old_value": None },
+          },
+        }
+      )
+
+      self.assertEqual(response.status_code, 200)
 
 
 if __name__ == '__main__':
