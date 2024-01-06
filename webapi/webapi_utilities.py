@@ -1,6 +1,7 @@
 import pymysql
 import json
 import pydantic
+import datetime
 
 def connect(is_testing: bool) -> pymysql.connections.Connection:
     #print("app.testing: ", is_testing)
@@ -26,5 +27,7 @@ def make_json(data) -> bytes:
 def default_proc(obj: object):
     if isinstance(obj, pydantic.BaseModel):
       return obj.model_dump()
+    if isinstance(obj, datetime.datetime):
+      return str(datetime.datetime)
     else:
       return obj

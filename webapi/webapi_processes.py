@@ -6,6 +6,7 @@ import pydantic
 import pydantic.alias_generators
 import typing
 import uuid
+import datetime
 
 from webapi_utilities import (
   connect,
@@ -39,6 +40,126 @@ def get_process_tree(ids: str) -> tuple[bytes, int]:
     ids_list = ids.split(";")
     result = build_json(connection, ids_list)
     return make_json(result), 200
+
+
+
+class GetProcessResultEntries(pydantic.BaseModel):
+  conditions: dict[str, str|datetime.datetime]
+  evaluations: dict[str, str]
+
+class GetProcessesResultContainer(pydantic.BaseModel):
+  entries: dict[str, GetProcessResultEntries]
+
+@app.get("/api/processes/<string:process_type>/<string:process_ids>")
+def get_processes(
+  process_type: str,
+  process_ids: str
+) -> tuple[bytes, int]:
+  """
+  response body: {
+    "process_id_0": {
+      "process_type": "process_type_0",
+      "conditions": {
+        "condition_0": "condition_value_0",
+        ...
+      },
+      "evaluations": {
+        "evaluation_type_0": "evaluation_value_0",
+        ...
+      }
+    },
+    "process_id_1": ...
+  }
+  """
+  result_container = GetProcessesResultContainer(entries={})
+  process_id_list = process_ids.split(";")
+  with connect(app.testing) as connection:
+    # get process condition table name 
+    with connection.cursor() as cursor:
+      cursor.execute(
+        "SELECT table_name FROM process_master WHERE process_type = %s",
+        process_type
+      )
+      condition_table_name = cursor.fetchone().get("table_name")
+    # get process conditions from the table
+    with connection.cursor() as cursor:
+      cursor.execute(
+        f"""
+          SELECT
+            *
+          FROM
+            {condition_table_name}
+          WHERE
+            process_id in ({','.join(['%s']*len(process_id_list))})
+        """,
+        process_id_list
+      )
+      conditions_data_list = cursor.fetchall()
+    for conditions_data in conditions_data_list:
+      result_container.entries[conditions_data.get("process_id")] = GetProcessResultEntries(
+        conditions = {
+          k: v
+          for k, v in conditions_data.items()
+        },
+        evaluations={}
+      )
+    # get evaluations related to specified ids
+    with connection.cursor() as cursor:
+      cursor.execute(
+        f"""
+          SELECT
+            process_id,
+            evaluation_type
+          FROM
+            evaluation_list
+          WHERE
+            process_id in ({','.join(['%s']*len(process_id_list))})
+        """,
+        process_id_list
+      )
+      evaluation_list_data_list = cursor.fetchall()
+    if len(evaluation_list_data_list) > 0:
+      evaluation_list_data_list.sort(key=lambda d: d["evaluation_type"])
+      for key, group in itertools.groupby(
+        evaluation_list_data_list,
+        key=lambda d: d["evaluation_type"]
+      ):
+        # group is iterator, so consumed once accessed...
+        # if it is possible to use it more than once, 
+        # turning it to a list is usefull
+        group_list = list(group) 
+        # get evaluation table name
+        with connection.cursor() as cursor:
+          cursor.execute(
+            "SELECT table_name FROM evaluation_master WHERE evaluation_type = %s",
+            key
+          )
+          evaluation_table_name = cursor.fetchone()["table_name"]
+        # get evaluation data grouped by evaluation type (table_name)
+        related_process_id_list = [ d["process_id"] for d in group_list ]
+        with connection.cursor() as cursor:
+          cursor.execute(
+            f"""
+              SELECT
+                *
+              FROM
+                {evaluation_table_name}
+              WHERE
+                process_id in (','.join(['%s'].join(related_process_id_list)))
+            """,
+            related_process_id_list
+          )
+          evaluation_data_list = cursor.fetchall()
+        # write evaluation data into dictionary
+        for evaluation_data in evaluation_data_list:
+          # evaluation column name is same as the table name,
+          # but it is only one, so getting first value as evaluation value works.
+          result_container.entries[
+            evaluation_data.get("process_id")
+          ].evaluations[key] = next(evaluation_data.values())
+        
+  return make_json(result_container.entries), 200
+
 
 
 class NewAndOldValuePair(pydantic.BaseModel):
@@ -96,6 +217,7 @@ def insert_or_update_process(
       table_name = cursor.fetchone()["table_name"]
     # insert process_list data if there's no process_list entry
     # and insert process conditions
+    connection.begin()
     with connection.cursor() as cursor:
       if process_list_data is None:
         cursor.execute(

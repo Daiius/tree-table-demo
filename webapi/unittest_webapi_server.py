@@ -1,4 +1,5 @@
 import unittest
+import json
 from unittest.mock import patch, MagicMock
 
 from webapi_server import app
@@ -40,6 +41,11 @@ class WebApiServerTest(unittest.TestCase):
       self.assertEqual(response.status_code, 200)
       data = response.text
       print(data, flush=True)
+      
+    def test_get_processes(self) -> None:
+      response = self.client.get("/api/processes/material/0")
+      self.assertEqual(response.status_code, 200)
+      print(response.text, flush=True)
 
     def test_insert_process(self) -> None:
       response = self.client.put(
@@ -53,6 +59,14 @@ class WebApiServerTest(unittest.TestCase):
         }
       )
       self.assertEqual(response.status_code, 200)
+
+      response = self.client.get("/api/processes/cutting/900")
+      data = json.loads(response.text)
+      print(data, flush=True)
+      self.assertEqual(data["900"]["conditions"]["tool"], "knife")
+      self.assertEqual(data["900"]["conditions"]["operator"], "Charlie")
+
+
 
 if __name__ == '__main__':
     unittest.main()
