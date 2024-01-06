@@ -1,5 +1,6 @@
 import pymysql
 import json
+import pydantic
 
 def connect(is_testing: bool) -> pymysql.connections.Connection:
     #print("app.testing: ", is_testing)
@@ -20,4 +21,10 @@ def connect(is_testing: bool) -> pymysql.connections.Connection:
     
 
 def make_json(data) -> bytes:
-    return json.dumps(data).encode('utf-8')
+    return json.dumps(data, default=default_proc).encode('utf-8')
+
+def default_proc(obj: object):
+    if isinstance(obj, pydantic.BaseModel):
+      return obj.model_dump()
+    else:
+      return obj

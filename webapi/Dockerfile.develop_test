@@ -2,7 +2,7 @@ FROM python:3.11-bullseye
 
 WORKDIR /develop
 
-RUN pip install flask flask-cors flask-login pymysql cryptography dataclasses_json uwsgi
+RUN pip install flask flask-cors flask-login pymysql cryptography dataclasses_json uwsgi pydantic
 
 COPY *.py uwsgi.ini /develop/
 

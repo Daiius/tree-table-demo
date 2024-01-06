@@ -10,13 +10,9 @@ class WebApiServerTest(unittest.TestCase):
         # enable usual exception propagation,
         # not like HTTP error message by default Flask error handler.
         self.app.testing = True
-        #print("self.app.testing = True")
         self.client.post(
-            "/api/login",
-            json = {
-                "password": "test",
-                "username": "test"
-            }
+          "/api/login",
+          json = { "password": "test", "username": "test" }
         )
 
     def test_get_process_list(self) -> None:
@@ -44,6 +40,19 @@ class WebApiServerTest(unittest.TestCase):
       self.assertEqual(response.status_code, 200)
       data = response.text
       print(data, flush=True)
+
+    def test_insert_process(self) -> None:
+      response = self.client.put(
+        "/api/process/cutting/900",
+        json = {
+          "conditions": {
+            "tool": { "new_value": "knife", "old_value": "None" },
+            "operator": { "newValue": "Charlie", "oldValue": None },
+          },
+          "parentId": "0"
+        }
+      )
+      self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
     unittest.main()

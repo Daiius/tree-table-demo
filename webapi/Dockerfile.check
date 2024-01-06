@@ -7,9 +7,9 @@ RUN pip install mypy \
   types-PyMySQL types-Flask types-Flask-Cors
 
 # runtime libraries
-RUN pip install flask flask-cors flask-login pymysql dataclasses_json
+RUN pip install flask flask-cors flask-login pymysql dataclasses_json pydantic
 
-COPY *.py /check
+COPY *.py mypy.ini /check
 
 CMD mypy webapi_server.py unittest_webapi_server.py
 

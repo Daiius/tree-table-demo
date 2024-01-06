@@ -2,7 +2,7 @@ FROM python:3.11-bullseye
 
 WORKDIR /test
 
-RUN pip install flask flask-cors flask-login pymysql cryptography dataclasses_json
+RUN pip install flask flask-cors flask-login pymysql cryptography dataclasses_json pydantic
 
 COPY *.py /test/
 

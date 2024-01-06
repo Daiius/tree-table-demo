@@ -10,7 +10,7 @@ from webapi_utilities import (
 )
 
 @app.get("/api/master-info")
-def get_master_info() -> tuple[flask.Response, int]:
+def get_master_info() -> tuple[bytes, int]:
   """
   get process and evaluation master informations,
   which contains column names of every condition/evaluation table,

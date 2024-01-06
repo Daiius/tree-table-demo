@@ -17,12 +17,6 @@ from webapi_utilities import (
   make_json,
 )
 
-
-from webapi_server_helper import (
-  build_json,
-  ProcessTreeNode
-)
-
 from flask_login import ( # type: ignore
   login_required,
   LoginManager,
@@ -37,6 +31,7 @@ login_manager.init_app(app)
 
 
 import webapi_masters
+import webapi_processes
 
 class User(UserMixin):
     def __init__(self, user_id: str):
@@ -48,11 +43,11 @@ def load_user(user_id: str) -> User:
  
 @app.get("/api/login")
 @login_required
-def get_login() -> tuple[flask.Response, int]:
+def get_login() -> tuple[bytes, int]:
     return make_json("you are an active user!"), 200
 
 @app.post("/api/login")
-def post_login() -> tuple[flask.Response, int]:
+def post_login() -> tuple[bytes, int]:
     data = json.loads(request.get_data())
     username = data["username"]
     password = data["password"]
@@ -68,55 +63,6 @@ def post_login() -> tuple[flask.Response, int]:
         return make_json("login failed..."), 403
     
     return make_json("unexpected request type."), 500
-
-
-@app.get("/api/processes")
-def get_process_list() -> tuple[flask.Response, int]:
-    connection = connect(app.testing)
-    with connection.cursor() as cursor:
-        cursor.execute("select * from process_list")
-        result = cursor.fetchall()
-    return make_json(result), 200
-
-@app.get("/api/processes/roots")
-def get_process_roots() -> tuple[flask.Response, int]:
-    connection = connect(app.testing)
-    with connection.cursor() as cursor:
-        cursor.execute("select * from process_list where prev_id is NULL")
-        result = cursor.fetchall()
-    return make_json(result), 200
-
-@app.get("/api/processes/trees/<string:ids>")
-def get_process_tree(ids: str) -> tuple[flask.Response, int]:
-    """
-    ids: semicolon separated process ids
-    """
-    connection = connect(app.testing)
-    ids_list = ids.split(";")
-    result = build_json(connection, ids_list)
-    return make_json(result), 200
-
-@app.put("/api/process/<string:process_type>/<string:process_id>")
-def update_process(process_type: str, process_id: str) -> tuple[flask.Response, int]:
-  """
-    body: {
-      "conditionName1": {
-        "newValue1": "value",
-        "oldValue1": "to detect conflict by multi user editing"
-      },
-      ...
-    }
-  """
-  data = request.get_json()
-  connection = connect(app.testing)
-  webapi_server_helper.update_process(
-    process_type = process_type,
-    process_id = process_id,
-    data = data,
-    connection = connection
-  )
-  return make_json(data), 200
-
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8000)
