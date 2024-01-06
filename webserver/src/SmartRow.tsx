@@ -45,6 +45,7 @@ const SmartRow: React.FC<SmartRowProps> = ({
         <SmartCell
           key={name}
           processType={node.process_type}
+          parentId={node.parent?.process_id}
           nodeId={node.process_id}
           columnName={name}
           initialValue={

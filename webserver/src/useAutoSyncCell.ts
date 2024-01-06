@@ -1,13 +1,18 @@
 import { useState, useEffect } from 'react';
 
-import { FocusMode } from './useTableCellFocus';
+import axios from 'axios';
+import { getAPIUrl } from 'communications';
 
+import { FocusMode } from './useTableCellFocus';
 import { sleep } from './commonTypes';
+
+
 
 export type SyncStatus = "OK" | "Updating" | "Updated" | "Error"
 
 export type UseAutoSyncCellArgs = {
   processType: string;
+  parentId?: string;
   nodeId: string;
   columnName: string;
   initialValue: string;
@@ -24,6 +29,7 @@ export type UseAutoSyncCellHookResult = {
 
 export const useAutoSyncCell = ({
   processType,
+  parentId,
   nodeId,
   columnName,
   initialValue,
@@ -43,22 +49,22 @@ export const useAutoSyncCell = ({
     if (lastFocusMode === "Editing" && focusMode === "Focused") {
       if (lastValue != value) {
         setStatus("Updating");
-        fetch(
-          `http://localhost/api/process/${processType}/${nodeId}`,
+        axios.put(
+          getAPIUrl() + `/api/process/${processType}/${nodeId}`,
           {
-            method: 'PUT',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+            conditions: {
               [columnName]: {
-                "newValue": value,
-                "oldValue": lastValue
-              } 
-            })
-          }
+                newValue: value,
+                oldValue: lastValue
+              },
+            }, 
+            parentId
+          },
+          { headers: { "Content-Type": "application/json" }}
         ).then(response => {
-          if (!response.ok) throw Error(
-            "Error occurred during fetch, " + response.statusText
-          );
+          //if (!response.ok) throw Error(
+          //  "Error occurred during fetch, " + response.statusText
+          //);
           setStatus("Updated");
           setLastValue(value);
           setErrorMessage(undefined);

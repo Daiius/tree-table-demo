@@ -10,6 +10,7 @@ import { useAutoSyncCell } from './useAutoSyncCell';
 
 export type SmartCellProps = {
   processType: string;
+  parentId?: string;
   nodeId: string;
   columnName: string;
   initialValue: string;
@@ -20,6 +21,7 @@ export type SmartCellProps = {
 
 const SmartCell: React.FC<SmartCellProps> = ({
   processType,
+  parentId,
   nodeId,
   columnName,
   initialValue,
@@ -35,6 +37,7 @@ const SmartCell: React.FC<SmartCellProps> = ({
     errorMessage
   } = useAutoSyncCell({
     processType,
+    parentId,
     nodeId,
     columnName,
     initialValue,
@@ -70,3 +73,4 @@ const SmartCell: React.FC<SmartCellProps> = ({
 };
 
 export default SmartCell;
+
