@@ -1,15 +1,17 @@
 import pymysql
 import json
 
-def connect(is_testing: bool) -> pymysql.connections.Connection:
-    #print("app.testing: ", is_testing)
-    if is_testing:
-        host = "tree-table-demo-webapi-test-database"
-    else:
-        host = "tree-table-demo-database"
+
+import os
+
+DATABASE_HOST_NAME = os.environ.get("DATABASE_HOST_NAME", None)
+if DATABASE_HOST_NAME is None:
+  raise Exception("DATABASE_HOST_NAME environment variable is not defined.")
+
+def connect() -> pymysql.connections.Connection:
 
     return pymysql.connect(
-        host = host,
+        host = DATABASE_HOST_NAME,
         user = "root",
         password = "tree-table-demo-database-mysql-root-password",
         database = "tree_table_demo",
