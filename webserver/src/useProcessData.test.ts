@@ -1,22 +1,13 @@
 import { useProcessData } from 'useProcessData';
-import useSWR from 'swr';
 import axios from 'axios';
-import { getAPIUrl } from 'communications';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 
-jest.mock('communications', () => ({
-  ...jest.requireActual('communications'),
-  getAPIUrl: jest.fn().mockImplementation(() => {
-    console.log("getAPIUrl called!!");
-    return "http://tree-table-demo-webapi:8000";}
-  ),
-}));
 
 describe('useProcessData custom hook test', () => {
 
   test('simple axios test', async () => {
     const response = await axios.post(
-      getAPIUrl() + '/api/login',
+      '/api/login',
       { username: "test", password: "test" }
     );
 
@@ -26,7 +17,7 @@ describe('useProcessData custom hook test', () => {
   });
 
   test('useProcessData() call test', async () => {
-    const { result, rerender } = renderHook(() => useProcessData());
+    const { result } = renderHook(() => useProcessData());
 
     await waitFor(() => expect(result.current.node).not.toBeUndefined());
 

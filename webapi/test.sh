@@ -4,9 +4,9 @@ compose_file=docker-compose-test.yml
 
 set -e
 docker compose -f $compose_file build
-set -e
+set +e
 
-docker compose -f $compose_file up --exit-code-from=tree-table-demo-webapi-test
+docker compose -f $compose_file up --exit-code-from=webapi-test
 
 # copy necessary files
 

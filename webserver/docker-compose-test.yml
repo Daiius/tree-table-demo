@@ -5,34 +5,40 @@ services:
     build:
       context: ../database
       dockerfile: Dockerfile.test
-    container_name: tree-table-demo-database
+    container_name: tree-table-demo-database-test
     healthcheck:
-      test: "mysql -u root -ptree-table-demo-database-mysql-root-password tree_table_demo -e 'select 1;'"
+      test: "mysqladmin ping"
       interval: 5s
       timeout: 20s
       retries: 3
-      start_period: 5s
+      start_period: 2s
   webapi:
     build:
       context: ../webapi
       dockerfile: Dockerfile.develop_test
-    container_name: tree-table-demo-webapi
+    container_name: tree-table-demo-webapi-test
+    environment:
+      DATABASE_HOST_NAME: database
+      WEBAPI_PORT: 80
     stop_signal: SIGKILL
     healthcheck:
-      test: "curl -f -X POST -H 'Content-Type: application/json' -d '{\"username\": \"test\", \"password\": \"test\" }' http://localhost:8000/api/login"
+      test: "curl -f -X POST -H 'Content-Type: application/json' -d '{\"username\": \"test\", \"password\": \"test\" }' http://localhost/api/login"
       interval: 5s
       timeout: 20s
       retries: 3
-      start_period: 5s
+      start_period: 2s
   webserver-test:
     build:
       context: .
       dockerfile: Dockerfile.test
     container_name: tree-table-demo-webserver-test
+    environment:
+      WEBAPI_HOST_NAME: webapi
     depends_on:
-      webapi:
-        condition: service_healthy
+      #webapi:
+      #  condition: service_healthy
       database:
         condition: service_healthy
+    network_mode: "service:webapi"
 
 

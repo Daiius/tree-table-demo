@@ -10,7 +10,7 @@ from webapi_utilities import (
 )
 
 @app.get("/api/master-info")
-def get_master_info() -> tuple[flask.Response, int]:
+def get_master_info() -> tuple[bytes, int]:
   """
   get process and evaluation master informations,
   which contains column names of every condition/evaluation table,
@@ -46,7 +46,7 @@ def get_master_info() -> tuple[flask.Response, int]:
   }
 
   """
-  connection = connect(app.testing)
+  connection = connect()
   master_info: dict[str, typing.Any] = {}
   conditions = master_info["conditions"] = {} # assign empty dictionary and shorter name
   # build condition master information

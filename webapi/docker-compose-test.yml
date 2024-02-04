@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  tree-table-demo-webapi-test-database:
+  database:
     build:
       context: ../database
       dockerfile: Dockerfile.test
@@ -15,13 +15,15 @@ services:
       retries: 10
       start_period: 2s
 
-  tree-table-demo-webapi-test:
+  webapi-test:
     build:
       context: .
       dockerfile: Dockerfile.test
     container_name: tree-table-demo-webapi-test
+    environment:
+      DATABASE_HOST_NAME: database
     depends_on:
-      tree-table-demo-webapi-test-database:
+      database:
         condition: service_healthy
 
 networks:
